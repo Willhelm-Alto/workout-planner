@@ -3,14 +3,15 @@ import 'package:gym_tracker/widgets/new_exercise.dart';
 import 'package:gym_tracker/workout.dart';
 import 'package:uuid/uuid.dart';
 
-class AddWorkoutForm extends StatefulWidget {
-  const AddWorkoutForm({super.key});
+class EditWorkout extends StatefulWidget {
+  const EditWorkout({this.workout, super.key});
+  final Workout? workout;
 
   @override
-  AddWorkoutFormState createState() => AddWorkoutFormState();
+  EditWorkoutState createState() => EditWorkoutState();
 }
 
-class AddWorkoutFormState extends State<AddWorkoutForm> {
+class EditWorkoutState extends State<EditWorkout> {
   final WorkoutManager _manager = WorkoutManager();
 
   final _formKey = GlobalKey<FormState>();
@@ -19,9 +20,17 @@ class AddWorkoutFormState extends State<AddWorkoutForm> {
   List<Exercise> exercises = [];
   DayOfWeek _selectedDayOfWeek = DayOfWeek.segunda;
 
+  bool isNew = false;
+
   @override
   void initState() {
     super.initState();
+    widget.workout == null ? isNew = true : isNew = false;
+    if (!isNew) {
+      _workoutNameController.text = widget.workout!.title;
+      _selectedDayOfWeek = widget.workout!.day;
+      exercises.addAll(widget.workout!.exercises);
+    }
   }
 
   @override
@@ -33,7 +42,7 @@ class AddWorkoutFormState extends State<AddWorkoutForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Novo Treino")),
+      appBar: AppBar(title: Text(isNew ? "Novo Treino" : "Editar Treino")),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -42,7 +51,7 @@ class AddWorkoutFormState extends State<AddWorkoutForm> {
             TextFormField(
               controller: _workoutNameController,
               style: TextStyle(fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
+              // textAlign: TextAlign.center,
               decoration: InputDecoration(
                 label: Text("Nome do Treino"),
                 labelStyle: TextStyle(
@@ -64,7 +73,7 @@ class AddWorkoutFormState extends State<AddWorkoutForm> {
                     (e) => DropdownMenuItem(
                       value: e,
                       child: Text(
-                        e.name,
+                        e.label,
                         style: TextStyle(fontWeight: FontWeight.normal),
                       ),
                     ),
@@ -142,21 +151,26 @@ class AddWorkoutFormState extends State<AddWorkoutForm> {
         child: SizedBox(
           height: 56,
           child: TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 var workout = Workout(
-                  id: Uuid().v4(),
+                  id: isNew ? Uuid().v4() : widget.workout!.id,
                   title: _workoutNameController.text,
                   exercises: exercises,
                   day: _selectedDayOfWeek,
                 );
-                if (_manager.checkValid(workout)) {
-                  _manager.saveWorkout(workout);
-                  Navigator.of(context).pop();
+                if (isNew) {
+                  if (_manager.checkValid(workout)) {
+                    await _manager.saveWorkout(workout);
+                    Navigator.of(context).pop();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Já existe um treino nesse dia")),
+                    );
+                  }
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("aaaa"))
-                  );
+                  await _manager.editWorkout(workout);
+                  Navigator.of(context).pop();
                 }
               }
             },

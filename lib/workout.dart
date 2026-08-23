@@ -2,7 +2,34 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-enum DayOfWeek { segunda, terca, quarta, quinta, sexta, sabado, domingo }
+enum DayOfWeek {
+  segunda,
+  terca,
+  quarta,
+  quinta,
+  sexta,
+  sabado,
+  domingo;
+
+  String get label {
+    switch (this) {
+      case segunda:
+        return "Segunda-feira";
+      case terca:
+        return "Terça-feira";
+      case quarta:
+        return "Quarta-quarta";
+      case quinta:
+        return "Quinta-feira";
+      case sexta:
+        return "Sexta-feira";
+      case sabado:
+        return "Sabádo";
+      case domingo:
+        return "Domingo";
+    }
+  }
+}
 
 class Workout {
   String id;
@@ -103,6 +130,27 @@ class WorkoutManager {
     }
   }
 
+  Future<void> saveWorkout(Workout w) async {
+    _workouts.add(w);
+    await writeWorkoutFile();
+  }
+
+  Future<void> deleteWorkout(Workout w) async {
+    _workouts.remove(w);
+    await writeWorkoutFile();
+  }
+
+  Future<void> editWorkout(Workout w) async {
+    final edit = _workouts.firstWhere((e) => e.id == w.id);
+    _workouts.remove(edit);
+
+    edit.title = w.title;
+    edit.day = w.day;
+    edit.exercises = w.exercises;
+
+    await saveWorkout(edit);
+  }
+
   Future<void> writeWorkoutFile() async {
     Directory appDir = await getApplicationDocumentsDirectory();
     File file = File("${appDir.path}/workout.json");
@@ -110,11 +158,6 @@ class WorkoutManager {
     file.writeAsStringSync(
       jsonEncode(_workouts.map((e) => e.toJson()).toList()),
     );
-  }
-
-  void saveWorkout(Workout workout) {
-    _workouts.add(workout);
-    writeWorkoutFile();
   }
 
   bool checkValid(Workout w) {
