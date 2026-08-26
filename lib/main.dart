@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gym_tracker/pages/edit_workout.dart';
 import 'package:gym_tracker/pages/home_page.dart';
 import 'package:gym_tracker/pages/workout_page.dart';
-import 'package:gym_tracker/workout.dart';
-import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,13 +50,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   static const List<Widget> _pages = [HomePage(), WorkoutPage()];
   int _pageIndex = 0;
-  WorkoutManager manager = WorkoutManager();
-
-  @override
-  void initState() {
-    super.initState();
-    manager.load();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,19 +57,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text("Seu Treino"),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              Directory appDir = await getApplicationDocumentsDirectory();
-              File file = File("${appDir.path}/workout.json");
-              setState(() {
-                file.delete();
-                manager.clearWorkouts();
-              });
-            },
-            icon: Icon(Icons.delete),
-          ),
-        ],
       ),
       body: _pages.elementAt(_pageIndex),
       bottomNavigationBar: BottomNavigationBar(
@@ -92,6 +70,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
         ],
       ),
+      floatingActionButton: _pageIndex == 1 ? IconButton(
+          style: IconButton.styleFrom(side: BorderSide(color: Colors.blue)),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditWorkout()),
+          ).then((value) => setState((){}),),
+          icon: Icon(Icons.add, color: Colors.blue),
+        ) : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

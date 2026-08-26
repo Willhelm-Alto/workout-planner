@@ -27,7 +27,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Dismissible(
                     direction: DismissDirection.startToEnd,
-                    dismissThresholds: {},
                     background: Container(
                       decoration: BoxDecoration(
                         color: Colors.red,
@@ -38,7 +37,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       child: Icon(Icons.delete, color: Colors.white),
                     ),
                     key: ValueKey(e.id),
-                    onDismissed: (direction) {
+                    onDismissed: (_) async{
+                      await manager.deleteWorkout(e);
                     },
                     child: WorkoutCard(workout: e, then: () => setState((){})),
                   ),
@@ -46,14 +46,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
               ),
             ],
           ),
-        ),
-        IconButton(
-          style: IconButton.styleFrom(side: BorderSide(color: Colors.grey)),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EditWorkout()),
-          ),
-          icon: Icon(Icons.add, color: Colors.grey),
         ),
       ],
     );

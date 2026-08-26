@@ -21,6 +21,7 @@ class EditWorkoutState extends State<EditWorkout> {
   DayOfWeek _selectedDayOfWeek = DayOfWeek.segunda;
 
   bool isNew = false;
+  bool showTimeField = false;
 
   @override
   void initState() {
@@ -51,7 +52,6 @@ class EditWorkoutState extends State<EditWorkout> {
             TextFormField(
               controller: _workoutNameController,
               style: TextStyle(fontWeight: FontWeight.w600),
-              // textAlign: TextAlign.center,
               decoration: InputDecoration(
                 label: Text("Nome do Treino"),
                 labelStyle: TextStyle(
@@ -88,6 +88,26 @@ class EditWorkoutState extends State<EditWorkout> {
                 _selectedDayOfWeek = value!;
               },
             ),
+            // SizedBox(height: 16),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: SwitchListTile(
+            //         title: Text("Marcar horário"),
+            //         dense: true,
+            //         visualDensity: VisualDensity.compact,
+            //         value: showTimeField, 
+            //         activeTrackColor: Colors.blue,
+            //         onChanged: (value) {
+            //           setState((){
+            //             showTimeField = value;
+            //           });
+            //         },
+            //       ),
+            //     ),
+            //     Expanded(child: TextFormField())
+            //   ],
+            // ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: Row(

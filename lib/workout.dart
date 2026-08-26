@@ -36,17 +36,22 @@ class Workout {
   String title;
   List<Exercise> exercises;
   DayOfWeek day;
+  DateTime? timeOfDay;
 
   Workout({
     required this.id,
     required this.title,
     required this.exercises,
     required this.day,
+    this.timeOfDay,
   });
 
   Workout.fromJson(Map<String, dynamic> data)
     : id = data["id"],
       title = data["title"],
+      timeOfDay = data["timeOfDay"] != null
+          ? DateTime.parse(data["timeOfDay"].toString())
+          : null,
       exercises = (data["exercises"] as List)
           .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -58,6 +63,7 @@ class Workout {
       "title": title,
       "exercises": exercises.map((e) => e.toJson()).toList(),
       "day": day.name,
+      "timeOfDay": timeOfDay,
     };
   }
 }
@@ -68,6 +74,7 @@ class Exercise {
   int set;
   int restTime;
   int? weight;
+  int? duration;
 
   Exercise({
     required this.title,
@@ -75,6 +82,7 @@ class Exercise {
     this.set = 3,
     this.restTime = 30,
     this.weight,
+    this.duration,
   });
 
   Exercise.fromJson(Map<String, dynamic> data)
@@ -82,7 +90,8 @@ class Exercise {
       repetitions = data["repetitions"],
       set = data["set"],
       restTime = data["restTime"],
-      weight = data["weight"];
+      weight = data["weight"],
+      duration = data["duration"];
 
   Map<String, dynamic> toJson() {
     return {
@@ -91,6 +100,7 @@ class Exercise {
       "set": set,
       "restTime": restTime,
       "weight": weight,
+      "duration": duration,
     };
   }
 }
@@ -98,6 +108,7 @@ class Exercise {
 class WorkoutManager {
   static WorkoutManager? _instance; //instância da própria classe
   List<Workout> _workouts = [];
+  bool wasInitialized = false;
 
   WorkoutManager._(); //construtor com nome "_"
 
@@ -113,21 +124,25 @@ class WorkoutManager {
   }
 
   Future<void> load() async {
-    Directory appDir = await getApplicationDocumentsDirectory();
-    File workoutFile = File("${appDir.path}/workout.json");
+    if (!wasInitialized) {
+      Directory appDir = await getApplicationDocumentsDirectory();
+      File workoutFile = File("${appDir.path}/workout.json");
 
-    if (workoutFile.existsSync()) {
-      String contents = workoutFile.readAsStringSync().trim();
-      if (contents != "") {
-        List<dynamic> data = jsonDecode(contents);
-        for (var element in data) {
-          var w = element as Map<String, dynamic>;
-          _workouts.add(Workout.fromJson(w));
+      if (workoutFile.existsSync()) {
+        String contents = workoutFile.readAsStringSync().trim();
+        if (contents != "") {
+          List<dynamic> data = jsonDecode(contents);
+          for (var element in data) {
+            var w = element as Map<String, dynamic>;
+            _workouts.add(Workout.fromJson(w));
+          }
         }
+      } else {
+        workoutFile.writeAsStringSync(jsonEncode(""));
       }
-    } else {
-      workoutFile.writeAsStringSync(jsonEncode(""));
-    }
+      wasInitialized = true;
+    } 
+    return;
   }
 
   Future<void> saveWorkout(Workout w) async {
