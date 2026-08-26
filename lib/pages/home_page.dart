@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_tracker/pages/workout_tracker_page.dart';
+import 'package:gym_tracker/widgets/exercise_card.dart';
 import 'package:gym_tracker/workout.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -18,9 +19,57 @@ class HomePageState extends State<HomePage> {
   Widget _buildWorkoutOfDay(DateTime day) {
     final workout = _workoutForDay(day);
     if (workout == null) {
-      return const Center(child: Text("Nenhum treino neste dia"));
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.event_busy, size: 40, color: Colors.grey),
+            SizedBox(height: 12),
+            Text("Nenhum treino neste dia", style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      );
     }
-    return ListView(children: [ListTile(title: Text(workout.title))]);
+    final count = workout.exercises.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 4,
+            children: [
+              Text(
+                workout.title.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+              ),
+              Text(
+                "$count ${count == 1 ? 'exercício' : 'exercícios'}",
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: count == 0
+              ? const Center(
+                  child: Text(
+                    "Nenhum exercício neste treino",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  itemCount: count,
+                  itemBuilder: (_, i) =>
+                      ExerciseCard(exercise: workout.exercises[i], index: i),
+                ),
+        ),
+      ],
+    );
   }
 
   Workout? _workoutForDay(DateTime day) {
@@ -39,7 +88,7 @@ class HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         if(snapshot.connectionState != ConnectionState.done){
           return Center(child: CircularProgressIndicator());
-        } 
+        }
         return Column(
           children: [
             TableCalendar<Workout>(
