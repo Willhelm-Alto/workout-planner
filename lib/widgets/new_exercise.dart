@@ -22,6 +22,8 @@ class NewExercise extends StatefulWidget {
 }
 
 class _NewExerciseState extends State<NewExercise> {
+  bool isDuration = false;
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -55,6 +57,23 @@ class _NewExerciseState extends State<NewExercise> {
             Row(
               spacing: 8,
               children: [
+                isDuration ? Expanded(
+                  child: TextFormField(
+                    initialValue: 10.toString(),
+                    onChanged: (value) {
+                      if (value != "") {
+                        widget.exercise.set = int.parse(value);
+                      }
+                    },
+                    validator: (value) => widget.setValidator(value),
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                      label: Text('Duration'),
+                      labelStyle: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ) :
                 Expanded(
                   child: TextFormField(
                     initialValue: widget.exercise.set.toString(),
@@ -109,12 +128,24 @@ class _NewExerciseState extends State<NewExercise> {
                 ),
               ],
             ),
+            SizedBox(height: 12),
             Row(
               children: [
+                Switch(
+                  value: isDuration,
+                  onChanged: (value) => setState(() => isDuration = value),
+                  activeTrackColor: Colors.blue
+                ),
+                Text("Por Duração", style: TextStyle(
+                  fontSize: 14, 
+                  fontWeight: FontWeight.w500,
+                  color: isDuration ? Colors.blue.shade700 : Colors.grey
+                )),
+                Spacer(),
                 IconButton(
                   color: Colors.red,
                   onPressed: () => widget.onDelete(),
-                  icon: Icon(Icons.delete),
+                  icon: Icon(Icons.delete, size: 20),
                 ),
               ],
             ),
