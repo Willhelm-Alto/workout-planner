@@ -75,6 +75,7 @@ class Exercise {
   int restTime;
   int? weight;
   int? duration;
+  bool byTime = false;
 
   Exercise({
     required this.title,
@@ -83,6 +84,7 @@ class Exercise {
     this.restTime = 30,
     this.weight,
     this.duration,
+    this.byTime = false,
   });
 
   Exercise.fromJson(Map<String, dynamic> data)
@@ -91,7 +93,8 @@ class Exercise {
       set = data["set"],
       restTime = data["restTime"],
       weight = data["weight"],
-      duration = data["duration"];
+      duration = data["duration"],
+      byTime = data["byTime"];
 
   Map<String, dynamic> toJson() {
     return {
@@ -101,12 +104,15 @@ class Exercise {
       "restTime": restTime,
       "weight": weight,
       "duration": duration,
+      "byTime": byTime,
     };
   }
 }
 
 class WorkoutManager {
   static WorkoutManager? _instance; //instância da própria classe
+  
+  //TODO: Mudar _workouts para Map<int, Workout> a fim de preservar a ordem dos treinos
   List<Workout> _workouts = [];
   bool wasInitialized = false;
 
@@ -121,6 +127,21 @@ class WorkoutManager {
   List<Workout> get workouts => _workouts;
   void clearWorkouts() {
     _workouts = [];
+  }
+
+  printFile() async {
+    Directory appDir = await getApplicationDocumentsDirectory();
+    File workoutFile = File("${appDir.path}/workout.json");
+    String contents = workoutFile.readAsStringSync().trim();
+    print(contents);
+  }
+
+  nukeEverything()async {
+    Directory appDir = await getApplicationDocumentsDirectory();
+    File workoutFile = File("${appDir.path}/workout.json");
+    if(workoutFile.existsSync()){
+      workoutFile.delete();
+    }
   }
 
   Future<void> load() async {
@@ -141,7 +162,7 @@ class WorkoutManager {
         workoutFile.writeAsStringSync(jsonEncode(""));
       }
       wasInitialized = true;
-    } 
+    }
     return;
   }
 
@@ -175,7 +196,7 @@ class WorkoutManager {
     );
   }
 
-  bool checkValid(Workout w) {
+  bool checkIfValid(Workout w) {
     bool res = true;
     for (var e in workouts) {
       if (e.day == w.day) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_tracker/widgets/exercise_card.dart';
 import 'package:gym_tracker/workout.dart';
 
 class TrackerPage extends StatefulWidget {
@@ -13,8 +14,14 @@ class TrackerPage extends StatefulWidget {
 class _TrackerPageState extends State<TrackerPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-       child: null,
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.workout.title)),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: widget.workout.exercises.length,
+        itemBuilder: (_, i) =>
+            ExerciseCard(exercise: widget.workout.exercises[i], index: i),
+      ),
     );
   }
 }

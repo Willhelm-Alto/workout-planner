@@ -160,7 +160,7 @@ class EditWorkoutState extends State<EditWorkout> {
                   day: _selectedDayOfWeek,
                 );
                 if (isNew) {
-                  if (_manager.checkValid(workout)) {
+                  if (_manager.checkIfValid(workout)) {
                     await _manager.saveWorkout(workout);
                     Navigator.of(context).pop();
                   } else {

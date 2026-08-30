@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gym_tracker/pages/edit_workout.dart';
 import 'package:gym_tracker/pages/home_page.dart';
 import 'package:gym_tracker/pages/workout_page.dart';
+import 'package:gym_tracker/workout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,6 +58,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text("Seu Treino"),
         centerTitle: true,
+        actions: [
+          IconButton(onPressed: () async {
+            final manager = WorkoutManager();
+            await manager.printFile();
+          }, icon: Icon(Icons.delete))
+        ],
       ),
       body: _pages.elementAt(_pageIndex),
       bottomNavigationBar: BottomNavigationBar(
