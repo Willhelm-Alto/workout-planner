@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_tracker/widgets/bottom_sheet.dart';
 import 'package:gym_tracker/widgets/exercise_card.dart';
 import 'package:gym_tracker/workout.dart';
 
@@ -12,6 +13,13 @@ class TrackerPage extends StatefulWidget {
 }
 
 class _TrackerPageState extends State<TrackerPage> {
+  late Map<Exercise, bool> doneExercisesList;
+
+  @override
+  void initState() { 
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,6 +30,7 @@ class _TrackerPageState extends State<TrackerPage> {
         itemBuilder: (_, i) =>
             ExerciseCard(exercise: widget.workout.exercises[i], index: i),
       ),
+      bottomSheet: MainBotomSheet(),
     );
   }
 }

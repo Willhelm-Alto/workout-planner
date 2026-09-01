@@ -93,6 +93,7 @@ class HomePageState extends State<HomePage> {
           children: [
             TableCalendar<Workout>(
               calendarFormat: CalendarFormat.week,
+              headerStyle: HeaderStyle(titleCentered: true),
               availableCalendarFormats: const {CalendarFormat.week: 'Semana'},
               startingDayOfWeek: StartingDayOfWeek.monday,
               focusedDay: _today,
