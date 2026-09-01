@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gym_tracker/workout.dart';
 
 class ExerciseCard extends StatelessWidget {
-  const ExerciseCard({required this.exercise, required this.index, super.key});
+  const ExerciseCard({required this.exercise, required this.index, this.tracker, super.key});
   final Exercise exercise;
   final int index;
+  final Widget? tracker;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +58,7 @@ class ExerciseCard extends StatelessWidget {
                 ],
               ),
             ),
+            if(tracker != null) tracker!
           ],
         ),
       ),

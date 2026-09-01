@@ -128,10 +128,8 @@ class HomePageState extends State<HomePage> {
             SizedBox(
               width: double.infinity,
               height: 56,
-              child: TextButton(
-                onPressed: workout == null
-                    ? null
-                    : () => Navigator.push(
+              child: workout == null ? null :  TextButton(
+                onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => TrackerPage(workout: workout),

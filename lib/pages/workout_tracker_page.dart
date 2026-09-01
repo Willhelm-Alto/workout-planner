@@ -13,11 +13,12 @@ class TrackerPage extends StatefulWidget {
 }
 
 class _TrackerPageState extends State<TrackerPage> {
-  late Map<Exercise, bool> doneExercisesList;
+  Map<Exercise, bool> doneExercisesList = {};
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
+    widget.workout.exercises.forEach((e) => doneExercisesList[e] = false);
   }
 
   @override
@@ -27,8 +28,11 @@ class _TrackerPageState extends State<TrackerPage> {
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: widget.workout.exercises.length,
-        itemBuilder: (_, i) =>
-            ExerciseCard(exercise: widget.workout.exercises[i], index: i),
+        itemBuilder: (_, i) => ExerciseCard(
+          exercise: widget.workout.exercises[i],
+          index: i,
+          tracker: Switch(value: false, onChanged: (value) {}),
+        ),
       ),
       bottomSheet: MainBotomSheet(),
     );
