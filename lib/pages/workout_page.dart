@@ -2,52 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:gym_tracker/pages/edit_workout.dart';
 import 'package:gym_tracker/workout.dart';
 
-class WorkoutPage extends StatefulWidget {
-  const WorkoutPage({super.key});
+class WorkoutPage extends StatelessWidget {
+  WorkoutPage({super.key});
 
-  @override
-  State<WorkoutPage> createState() => _WorkoutPageState();
-}
-
-class _WorkoutPageState extends State<WorkoutPage> {
   final manager = WorkoutManager();
 
   @override
   Widget build(BuildContext context) {
-    if (manager.workouts.isEmpty) {
-      return EmptyWorkout();
-    }
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            children: [
-              ...manager.workouts.map(
-                (e) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Dismissible(
-                    direction: DismissDirection.startToEnd,
-                    background: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12)
+    return ListenableBuilder(
+      listenable: manager,
+      builder: (context, child) {
+        if(manager.workouts.isEmpty) return EmptyWorkout();
+        return Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  ...manager.workouts.map(
+                    (e) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Dismissible(
+                        direction: DismissDirection.startToEnd,
+                        background: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12)
+                          ),
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        key: ValueKey(e.id),
+                        onDismissed: (_) async{
+                          await manager.deleteWorkout(e);
+                        },
+                        child: WorkoutCard(workout: e),
                       ),
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Icon(Icons.delete, color: Colors.white),
                     ),
-                    key: ValueKey(e.id),
-                    onDismissed: (_) async{
-                      await manager.deleteWorkout(e);
-                    },
-                    child: WorkoutCard(workout: e, then: () => setState((){})),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      }
     );
   }
 }
@@ -88,9 +86,8 @@ class EmptyWorkout extends StatelessWidget {
 }
 
 class WorkoutCard extends StatelessWidget {
-  const WorkoutCard({super.key, required this.workout, required this.then});
+  const WorkoutCard({super.key, required this.workout});
   final Workout workout;
-  final Function then;
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +104,7 @@ class WorkoutCard extends StatelessWidget {
           MaterialPageRoute(
             builder: (_) => EditWorkout(workout: workout),
           ),
-        ).then((value) => then()),
+        ),
         child: Padding(
           padding: EdgeInsetsGeometry.all(15),
           child: Column(

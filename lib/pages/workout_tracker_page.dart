@@ -18,7 +18,9 @@ class _TrackerPageState extends State<TrackerPage> {
   @override
   void initState() {
     super.initState();
-    widget.workout.exercises.forEach((e) => doneExercisesList[e] = false);
+    for (final e in widget.workout.exercises) {
+      doneExercisesList[e] = false;
+    }
   }
 
   @override

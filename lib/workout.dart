@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum DayOfWeek {
@@ -96,6 +97,15 @@ class Exercise {
       duration = data["duration"],
       byTime = data["byTime"];
 
+  Exercise.copy(Exercise other)
+    : title = other.title,
+      repetitions = other.repetitions,
+      set = other.set,
+      restTime = other.restTime,
+      weight = other.weight,
+      duration = other.duration,
+      byTime = other.byTime;
+
   Map<String, dynamic> toJson() {
     return {
       "title": title,
@@ -109,11 +119,11 @@ class Exercise {
   }
 }
 
-class WorkoutManager {
+class WorkoutManager extends ChangeNotifier{
   static WorkoutManager? _instance; //instância da própria classe
   
   //TODO: Mudar _workouts para Map<int, Workout> a fim de preservar a ordem dos treinos
-  List<Workout> _workouts = [];
+  final List<Workout> _workouts = [];
   bool wasInitialized = false;
 
   WorkoutManager._(); //construtor com nome "_"
@@ -125,22 +135,23 @@ class WorkoutManager {
   }
 
   List<Workout> get workouts => _workouts;
-  void clearWorkouts() {
-    _workouts = [];
-  }
 
-  printFile() async {
+
+  //===========File functions===========//
+
+  Future<void> printFile() async {
     Directory appDir = await getApplicationDocumentsDirectory();
     File workoutFile = File("${appDir.path}/workout.json");
     String contents = workoutFile.readAsStringSync().trim();
-    print(contents);
+    debugPrint(contents);
+    debugPrint("WOKROUT LIST: $workouts");
   }
 
-  nukeEverything()async {
+  Future<void> nukeEverything() async {
     Directory appDir = await getApplicationDocumentsDirectory();
     File workoutFile = File("${appDir.path}/workout.json");
     if(workoutFile.existsSync()){
-      workoutFile.delete();
+      await workoutFile.delete();
     }
   }
 
@@ -166,13 +177,27 @@ class WorkoutManager {
     return;
   }
 
+  Future<void> writeWorkoutFile() async {
+    Directory appDir = await getApplicationDocumentsDirectory();
+    File file = File("${appDir.path}/workout.json");
+
+    file.writeAsStringSync(
+      jsonEncode(_workouts.map((e) => e.toJson()).toList()),
+    );
+  }
+
+  //=====================================//
+
+
   Future<void> saveWorkout(Workout w) async {
     _workouts.add(w);
+    notifyListeners();
     await writeWorkoutFile();
   }
 
   Future<void> deleteWorkout(Workout w) async {
     _workouts.remove(w);
+    notifyListeners();
     await writeWorkoutFile();
   }
 
@@ -187,19 +212,10 @@ class WorkoutManager {
     await saveWorkout(edit);
   }
 
-  Future<void> writeWorkoutFile() async {
-    Directory appDir = await getApplicationDocumentsDirectory();
-    File file = File("${appDir.path}/workout.json");
-
-    file.writeAsStringSync(
-      jsonEncode(_workouts.map((e) => e.toJson()).toList()),
-    );
-  }
-
   bool checkIfValid(Workout w) {
     bool res = true;
     for (var e in workouts) {
-      if (e.day == w.day) {
+      if (e.day == w.day && e.id != w.id) {
         res = false;
       }
     }

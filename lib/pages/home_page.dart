@@ -16,6 +16,8 @@ class HomePageState extends State<HomePage> {
   late DateTime _selectedDay = _today;
   WorkoutManager manager = WorkoutManager();
 
+  late final Future<void> _loadFuture = manager.load();
+
   Widget _buildWorkoutOfDay(DateTime day) {
     final workout = _workoutForDay(day);
     if (workout == null) {
@@ -82,86 +84,91 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final workout = _workoutForDay(_selectedDay);
     return FutureBuilder(
-      future: manager.load(),
+      future: _loadFuture,
       builder: (context, snapshot) {
         if(snapshot.connectionState != ConnectionState.done){
           return Center(child: CircularProgressIndicator());
         }
-        return Column(
-          children: [
-            TableCalendar<Workout>(
-              calendarFormat: CalendarFormat.week,
-              headerStyle: HeaderStyle(titleCentered: true),
-              availableCalendarFormats: const {CalendarFormat.week: 'Semana'},
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              focusedDay: _today,
-              firstDay: getFirstDayOfWeek(_today),
-              lastDay: getLastDayOfWeek(_today),
-              rowHeight: 70,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, selectedDay)) {
-                  setState(() => _selectedDay = selectedDay);
-                }
-              },
-              calendarBuilders: CalendarBuilders<Workout>(
-                markerBuilder: (context, day, _) {
-                  final workout = _workoutForDay(day);
-                  if (workout == null) return null;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      workout.title,
-                      style: const TextStyle(fontSize: 9),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                },
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(child: _buildWorkoutOfDay(_selectedDay)),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: workout == null ? null :  TextButton(
-                onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TrackerPage(workout: workout),
+        return ListenableBuilder(
+          listenable: manager,
+          builder: (context, child) {
+            final workout = _workoutForDay(_selectedDay);
+            return Column(
+              children: [
+                TableCalendar<Workout>(
+                  calendarFormat: CalendarFormat.week,
+                  headerStyle: HeaderStyle(titleCentered: true),
+                  availableCalendarFormats: const {CalendarFormat.week: 'Semana'},
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  focusedDay: _today,
+                  firstDay: getFirstDayOfWeek(_today),
+                  lastDay: getLastDayOfWeek(_today),
+                  rowHeight: 70,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    if (!isSameDay(_selectedDay, selectedDay)) {
+                      setState(() => _selectedDay = selectedDay);
+                    }
+                  },
+                  calendarBuilders: CalendarBuilders<Workout>(
+                    markerBuilder: (context, day, _) {
+                      final workout = _workoutForDay(day);
+                      if (workout == null) return null;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          workout.title,
+                          style: const TextStyle(fontSize: 9),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: Colors.grey[300],
-                  disabledForegroundColor: Colors.grey[600],
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                      );
+                    },
                   ),
                 ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "INICIAR",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.2,
+                const Divider(height: 1),
+                Expanded(child: _buildWorkoutOfDay(_selectedDay)),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: workout == null ? null :  TextButton(
+                    onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TrackerPage(workout: workout),
+                            ),
+                          ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey[300],
+                      disabledForegroundColor: Colors.grey[600],
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward_ios, size: 16),
-                  ],
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "INICIAR",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(Icons.arrow_forward_ios, size: 16),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          }
         );
       }
     );

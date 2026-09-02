@@ -58,7 +58,7 @@ class ExerciseCard extends StatelessWidget {
                 ],
               ),
             ),
-            if(tracker != null) tracker!
+            ?tracker
           ],
         ),
       ),

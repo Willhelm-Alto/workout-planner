@@ -30,14 +30,14 @@ class EditWorkoutState extends State<EditWorkout> {
     if (!isNew) {
       _workoutNameController.text = widget.workout!.title;
       _selectedDayOfWeek = widget.workout!.day;
-      exercises.addAll(widget.workout!.exercises);
+      exercises.addAll(widget.workout!.exercises.map(Exercise.copy));
     }
   }
 
   @override
   void dispose() {
-    super.dispose();
     _workoutNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -115,25 +115,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 onDelete: () => setState(() {
                   exercises.remove(e);
                 }),
-                nameValidator: (value) {
-                  if (value == null || value == "") {
-                    return "Preencha o nome do exercício";
-                  }
-                  return null;
-                },
-                setValidator: (value) {
-                  if (value == null || value == "") {
-                    return "Campo vazio";
-                  }
-                  return null;
-                },
-                repValidator: (value) {
-                  if (value == null || value == "") {
-                    return "Campo vazio";
-                  }
-                  return null;
-                },
-                restValidator: (value) {
+                fieldValidator: (value) {
                   if (value == null || value == "") {
                     return "Campo vazio";
                   }
@@ -159,19 +141,19 @@ class EditWorkoutState extends State<EditWorkout> {
                   exercises: exercises,
                   day: _selectedDayOfWeek,
                 );
+                if (!_manager.checkIfValid(workout)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Já existe um treino nesse dia")),
+                  );
+                  return;
+                }
                 if (isNew) {
-                  if (_manager.checkIfValid(workout)) {
-                    await _manager.saveWorkout(workout);
-                    Navigator.of(context).pop();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Já existe um treino nesse dia")),
-                    );
-                  }
+                  await _manager.saveWorkout(workout);
                 } else {
                   await _manager.editWorkout(workout);
-                  Navigator.of(context).pop();
                 }
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               }
             },
             style: TextButton.styleFrom(

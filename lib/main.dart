@@ -49,7 +49,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  static const List<Widget> _pages = [HomePage(), WorkoutPage()];
+  static final List<Widget> _pages = [const HomePage(), WorkoutPage()];
   int _pageIndex = 0;
 
   @override
@@ -62,6 +62,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           IconButton(onPressed: () async {
             final manager = WorkoutManager();
             await manager.printFile();
+            // await manager.nukeEverything();
           }, icon: Icon(Icons.delete))
         ],
       ),
@@ -83,7 +84,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditWorkout()),
-          ).then((value) => setState((){}),),
+          ),
           icon: Icon(Icons.add, color: Colors.blue),
         ) : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

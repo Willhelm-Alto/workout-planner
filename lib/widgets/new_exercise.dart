@@ -5,17 +5,11 @@ class NewExercise extends StatefulWidget {
   const NewExercise({
     required this.onDelete,
     required this.exercise,
-    required this.nameValidator,
-    required this.setValidator,
-    required this.repValidator,
-    required this.restValidator,
+    required this.fieldValidator,
     super.key,
   });
   final Function onDelete;
-  final Function(String? value) nameValidator;
-  final Function(String? value) setValidator;
-  final Function(String? value) repValidator;
-  final Function(String? value) restValidator;
+  final Function(String? value) fieldValidator;
   final Exercise exercise;
   @override
   State<NewExercise> createState() => _NewExerciseState();
@@ -38,6 +32,13 @@ class _NewExerciseState extends State<NewExercise> {
   }
 
   @override
+  void dispose() {
+    durationController.dispose();
+    setController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.only(bottom: 16),
@@ -53,7 +54,7 @@ class _NewExerciseState extends State<NewExercise> {
             TextFormField(
               initialValue: widget.exercise.title,
               onChanged: (value) => widget.exercise.title = value,
-              validator: (value) => widget.nameValidator(value),
+              validator: (value) => widget.fieldValidator(value),
               style: TextStyle(fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -75,11 +76,12 @@ class _NewExerciseState extends State<NewExercise> {
                         child: TextFormField(
                           controller: durationController,
                           onChanged: (value) {
-                            if (value != "") {
-                              widget.exercise.duration = int.parse(value);
+                            final parsed = int.tryParse(value);
+                            if (parsed != null) {
+                              widget.exercise.duration = parsed;
                             }
                           },
-                          validator: (value) => widget.setValidator(value),
+                          validator: (value) => widget.fieldValidator(value),
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -93,11 +95,12 @@ class _NewExerciseState extends State<NewExercise> {
                         child: TextFormField(
                           controller: setController,
                           onChanged: (value) {
-                            if (value != "") {
-                              widget.exercise.set = int.parse(value);
+                            final parsed = int.tryParse(value);
+                            if (parsed != null) {
+                              widget.exercise.set = parsed;
                             }
                           },
-                          validator: (value) => widget.setValidator(value),
+                          validator: (value) => widget.fieldValidator(value),
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -110,11 +113,12 @@ class _NewExerciseState extends State<NewExercise> {
                   child: TextFormField(
                     initialValue: widget.exercise.repetitions.toString(),
                     onChanged: (value) {
-                      if (value != "") {
-                        widget.exercise.repetitions = int.parse(value);
+                      final parsed = int.tryParse(value);
+                      if (parsed != null) {
+                        widget.exercise.repetitions = parsed;
                       }
                     },
-                    validator: (value) => widget.repValidator(value),
+                    validator: (value) => widget.fieldValidator(value),
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -127,11 +131,12 @@ class _NewExerciseState extends State<NewExercise> {
                   child: TextFormField(
                     initialValue: widget.exercise.restTime.toString(),
                     onChanged: (value) {
-                      if (value != "") {
-                        widget.exercise.restTime = int.parse(value);
+                      final parsed = int.tryParse(value);
+                      if (parsed != null) {
+                        widget.exercise.restTime = parsed;
                       }
                     },
-                    validator: (value) => widget.restValidator(value),
+                    validator: (value) => widget.fieldValidator(value),
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(horizontal: 8),
