@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gym_tracker/workout.dart';
 
 class NewExercise extends StatefulWidget {
@@ -18,16 +19,21 @@ class NewExercise extends StatefulWidget {
 class _NewExerciseState extends State<NewExercise> {
   final durationController = TextEditingController();
   final setController = TextEditingController();
+  final weightController = TextEditingController();
+  final observationController = TextEditingController();
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
-
     setController.text = widget.exercise.set.toString();
-    if(widget.exercise.duration != null){
-      durationController.text = widget.exercise.duration.toString();
-    } else {
-      durationController.text = "10";
+    widget.exercise.duration != null
+        ? durationController.text = widget.exercise.duration.toString()
+        : durationController.text = "10";
+    widget.exercise.weight != null
+        ? weightController.text = widget.exercise.weight.toString()
+        : weightController.text = "-";
+    if (widget.exercise.observation != null) {
+      observationController.text = widget.exercise.observation!;
     }
   }
 
@@ -35,6 +41,8 @@ class _NewExerciseState extends State<NewExercise> {
   void dispose() {
     durationController.dispose();
     setController.dispose();
+    weightController.dispose();
+    observationController.dispose();
     super.dispose();
   }
 
@@ -68,81 +76,137 @@ class _NewExerciseState extends State<NewExercise> {
               ),
             ),
             SizedBox(height: 12),
-            Row(
-              spacing: 8,
+            Column(
               children: [
-                widget.exercise.byTime
-                    ? Expanded(
-                        child: TextFormField(
-                          controller: durationController,
-                          onChanged: (value) {
-                            final parsed = int.tryParse(value);
-                            if (parsed != null) {
-                              widget.exercise.duration = parsed;
-                            }
-                          },
-                          validator: (value) => widget.fieldValidator(value),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                            label: Text('Duration'),
-                            labelStyle: TextStyle(color: Colors.grey),
-                            suffixText: "(s)"
+                Row(
+                  spacing: 8,
+                  children: [
+                    widget.exercise.byTime
+                        ? Expanded(
+                            child: TextFormField(
+                              controller: durationController,
+                              onChanged: (value) {
+                                final parsed = int.tryParse(value);
+                                if (parsed != null) {
+                                  widget.exercise.duration = parsed;
+                                }
+                              },
+                              validator: (value) =>
+                                  widget.fieldValidator(value),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                label: Text('Duration'),
+                                labelStyle: TextStyle(color: Colors.grey),
+                                suffixText: "(s)",
+                              ),
+                            ),
+                          )
+                        : Expanded(
+                            child: TextFormField(
+                              controller: setController,
+                              onChanged: (value) {
+                                final parsed = int.tryParse(value);
+                                if (parsed != null) {
+                                  widget.exercise.set = parsed;
+                                }
+                              },
+                              validator: (value) =>
+                                  widget.fieldValidator(value),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                label: Text('Set'),
+                                labelStyle: TextStyle(color: Colors.grey),
+                              ),
+                            ),
                           ),
-                        ),
-                      )
-                    : Expanded(
-                        child: TextFormField(
-                          controller: setController,
-                          onChanged: (value) {
-                            final parsed = int.tryParse(value);
-                            if (parsed != null) {
-                              widget.exercise.set = parsed;
-                            }
-                          },
-                          validator: (value) => widget.fieldValidator(value),
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                            label: Text('Set'),
-                            labelStyle: TextStyle(color: Colors.grey),
-                          ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.exercise.repetitions.toString(),
+                        onChanged: (value) {
+                          final parsed = int.tryParse(value);
+                          if (parsed != null) {
+                            widget.exercise.repetitions = parsed;
+                          }
+                        },
+                        validator: (value) => widget.fieldValidator(value),
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                          label: Text('Rep'),
+                          labelStyle: TextStyle(color: Colors.grey),
                         ),
                       ),
-                Expanded(
-                  child: TextFormField(
-                    initialValue: widget.exercise.repetitions.toString(),
-                    onChanged: (value) {
-                      final parsed = int.tryParse(value);
-                      if (parsed != null) {
-                        widget.exercise.repetitions = parsed;
-                      }
-                    },
-                    validator: (value) => widget.fieldValidator(value),
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                      label: Text('Rep'),
-                      labelStyle: TextStyle(color: Colors.grey),
                     ),
-                  ),
+                  ],
                 ),
+                SizedBox(height: 10),
+                Row(
+                  spacing: 8,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.exercise.restTime.toString(),
+                        onChanged: (value) {
+                          final parsed = int.tryParse(value);
+                          if (parsed != null) {
+                            widget.exercise.restTime = parsed;
+                          }
+                        },
+                        validator: (value) => widget.fieldValidator(value),
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                          label: Text('Descanço'),
+                          labelStyle: TextStyle(color: Colors.grey),
+                          suffixText: "(s)",
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        controller: weightController,
+                        onChanged: (value) {
+                          final parsed = int.tryParse(value);
+                          if (parsed != null) {
+                            widget.exercise.weight = parsed;
+                          }
+                        },
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                          label: Text('Peso'),
+                          labelStyle: TextStyle(color: Colors.grey),
+                          suffixText: "(kg)",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              children: [
                 Expanded(
                   child: TextFormField(
-                    initialValue: widget.exercise.restTime.toString(),
-                    onChanged: (value) {
-                      final parsed = int.tryParse(value);
-                      if (parsed != null) {
-                        widget.exercise.restTime = parsed;
-                      }
-                    },
-                    validator: (value) => widget.fieldValidator(value),
-                    keyboardType: TextInputType.number,
+                    controller: observationController,
+                    minLines: 3,
+                    maxLines: 3,
+                    keyboardType: TextInputType.multiline,
+                    onChanged: (value) => widget.exercise.observation = value,
                     decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                      label: Text('Rest'),
+                      contentPadding: EdgeInsets.all(10),
+                      label: Text('Obs.'),
                       labelStyle: TextStyle(color: Colors.grey),
-                      suffixText: "(s)",
                     ),
                   ),
                 ),
@@ -153,7 +217,8 @@ class _NewExerciseState extends State<NewExercise> {
               children: [
                 Switch(
                   value: widget.exercise.byTime,
-                  onChanged: (value) => setState(() => widget.exercise.byTime = value),
+                  onChanged: (value) =>
+                      setState(() => widget.exercise.byTime = value),
                   activeTrackColor: Colors.blue,
                 ),
                 Text(
@@ -161,7 +226,9 @@ class _NewExerciseState extends State<NewExercise> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: widget.exercise.byTime ? Colors.blue.shade700 : Colors.grey,
+                    color: widget.exercise.byTime
+                        ? Colors.blue.shade700
+                        : Colors.grey,
                   ),
                 ),
                 Spacer(),

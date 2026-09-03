@@ -80,6 +80,7 @@ class Exercise {
   int restTime;
   int? weight;
   int? duration;
+  String? observation;
   bool byTime = false;
 
   Exercise({
@@ -90,6 +91,7 @@ class Exercise {
     this.weight,
     this.duration,
     this.byTime = false,
+    this.observation
   });
 
   Exercise.fromJson(Map<String, dynamic> data)
@@ -99,7 +101,8 @@ class Exercise {
       restTime = data["restTime"],
       weight = data["weight"],
       duration = data["duration"],
-      byTime = data["byTime"];
+      byTime = data["byTime"],
+      observation = data["observation"];
 
   Exercise.copy(Exercise other)
     : title = other.title,
@@ -108,7 +111,8 @@ class Exercise {
       restTime = other.restTime,
       weight = other.weight,
       duration = other.duration,
-      byTime = other.byTime;
+      byTime = other.byTime,
+      observation = other.observation;
 
   Map<String, dynamic> toJson() {
     return {
@@ -119,6 +123,7 @@ class Exercise {
       "weight": weight,
       "duration": duration,
       "byTime": byTime,
+      "observation": observation
     };
   }
 }
