@@ -32,6 +32,10 @@ enum DayOfWeek {
   }
 }
 
+extension on DayOfWeek {
+  int compareTo(DayOfWeek other) => this.index.compareTo(other.index);
+}
+
 class Workout {
   String id;
   String title;
@@ -122,7 +126,6 @@ class Exercise {
 class WorkoutManager extends ChangeNotifier{
   static WorkoutManager? _instance; //instância da própria classe
   
-  //TODO: Mudar _workouts para Map<int, Workout> a fim de preservar a ordem dos treinos
   final List<Workout> _workouts = [];
   bool wasInitialized = false;
 
@@ -191,6 +194,7 @@ class WorkoutManager extends ChangeNotifier{
 
   Future<void> saveWorkout(Workout w) async {
     _workouts.add(w);
+    _workouts.sort((a, b) => a.day.compareTo(b.day));
     notifyListeners();
     await writeWorkoutFile();
   }
