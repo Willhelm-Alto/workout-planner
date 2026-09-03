@@ -137,7 +137,7 @@ class EditWorkoutState extends State<EditWorkout> {
               if (_formKey.currentState!.validate()) {
                 var workout = Workout(
                   id: isNew ? Uuid().v4() : widget.workout!.id,
-                  title: _workoutNameController.text,
+                  title: _workoutNameController.text.toUpperCase(),
                   exercises: exercises,
                   day: _selectedDayOfWeek,
                 );

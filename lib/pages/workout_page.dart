@@ -114,7 +114,7 @@ class WorkoutCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      workout.title.toUpperCase(),
+                      workout.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
