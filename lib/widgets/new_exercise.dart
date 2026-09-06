@@ -7,8 +7,10 @@ class NewExercise extends StatefulWidget {
     required this.onDelete,
     required this.exercise,
     required this.fieldValidator,
+    required this.index,
     super.key,
   });
+  final int index;
   final Function onDelete;
   final Function(String? value) fieldValidator;
   final Exercise exercise;
@@ -49,7 +51,7 @@ class _NewExerciseState extends State<NewExercise> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.symmetric(vertical: 8),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadiusGeometry.circular(12),
@@ -59,6 +61,17 @@ class _NewExerciseState extends State<NewExercise> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: ReorderableDragStartListener(
+                    index: widget.index,
+                    child: Icon(Icons.drag_handle, color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
             TextFormField(
               initialValue: widget.exercise.title,
               onChanged: (value) => widget.exercise.title = value,
@@ -98,7 +111,7 @@ class _NewExerciseState extends State<NewExercise> {
                                 contentPadding: EdgeInsets.symmetric(
                                   horizontal: 8,
                                 ),
-                                label: Text('Duration'),
+                                label: Text('Duração'),
                                 labelStyle: TextStyle(color: Colors.grey),
                                 suffixText: "(s)",
                               ),

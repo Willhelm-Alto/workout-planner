@@ -46,71 +46,108 @@ class EditWorkoutState extends State<EditWorkout> {
       appBar: AppBar(title: Text(isNew ? "Novo Treino" : "Editar Treino")),
       body: Form(
         key: _formKey,
-        child: ListView(
+        child: ReorderableListView(
           padding: EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _workoutNameController,
-              style: TextStyle(fontWeight: FontWeight.w600),
-              decoration: InputDecoration(
-                label: Text("Nome do Treino"),
-                labelStyle: TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value == "") {
-                  return "Preencha o nome do treino";
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField(
-              items: DayOfWeek.values
-                  .map(
-                    (e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(
-                        e.label,
-                        style: TextStyle(fontWeight: FontWeight.normal),
+          autoScrollerVelocityScalar: 20,
+          buildDefaultDragHandles: false,
+          onReorderItem: (oldIndex, newIndex) {
+            setState((){
+              final e = exercises.removeAt(oldIndex);
+              exercises.insert(newIndex, e);
+            });
+          },
+          proxyDecorator: (child, index, animation) {
+            return AnimatedBuilder(
+              animation: animation,
+                builder: (context, _) {
+                  final curve = Curves.easeInOut.transform(animation.value);
+                  return Material(
+                    color: Colors.transparent,
+                    child: Transform.scale(
+                      scale: 1 + 0.03 * curve,
+                      child: Opacity(
+                        opacity: 1 - 0.1 * curve, 
+                        child: child,
                       ),
                     ),
-                  )
-                  .toList(),
-              initialValue: _selectedDayOfWeek,
-              decoration: InputDecoration(
-                label: Text("Dia da Semana"),
-                labelStyle: TextStyle(color: Colors.grey),
-              ),
-              onChanged: (value) {
-                _selectedDayOfWeek = value!;
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Divider(),
-                    ),
+                  );
+               }
+            );
+          },
+          header: Column(
+            children: [
+              TextFormField(
+                controller: _workoutNameController,
+                style: TextStyle(fontWeight: FontWeight.w600),
+                decoration: InputDecoration(
+                  label: Text("Nome do Treino"),
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w600,
                   ),
-                  Text("Exercícios", style: TextStyle(color: Colors.grey)),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Divider(),
-                    ),
-                  ),
-                ],
+                ),
+                validator: (value) {
+                  if (value == null || value == "") {
+                    return "Preencha o nome do treino";
+                  }
+                  return null;
+                },
               ),
+              SizedBox(height: 16),
+              DropdownButtonFormField(
+                items: DayOfWeek.values
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e.label,
+                          style: TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                initialValue: _selectedDayOfWeek,
+                decoration: InputDecoration(
+                  label: Text("Dia da Semana"),
+                  labelStyle: TextStyle(color: Colors.grey),
+                ),
+                onChanged: (value) {
+                  _selectedDayOfWeek = value!;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        child: Divider(),
+                      ),
+                    ),
+                    Text("Exercícios", style: TextStyle(color: Colors.grey)),
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        child: Divider(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          footer:IconButton(
+              style: IconButton.styleFrom(side: BorderSide(color: Colors.grey)),
+              onPressed: () =>
+                  setState(() => exercises.add(Exercise(title: ""))),
+              icon: Icon(Icons.add, color: Colors.grey),
             ),
-            ...exercises.map(
-              (e) => NewExercise(
+          children: [
+            for(final (i, e) in exercises.indexed)
+              NewExercise(
                 key: ValueKey(e),
+                index: i,
                 exercise: e,
                 onDelete: () => setState(() {
                   exercises.remove(e);
@@ -122,11 +159,8 @@ class EditWorkoutState extends State<EditWorkout> {
                   return null;
                 },
               ),
-            ),
-            AddExercise(
-              onTap: () => setState(() => exercises.add(Exercise(title: ""))),
-            ),
-          ],
+            
+          ]
         ),
       ),
       bottomNavigationBar: SafeArea(
@@ -177,24 +211,6 @@ class EditWorkoutState extends State<EditWorkout> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class AddExercise extends StatefulWidget {
-  const AddExercise({required this.onTap, super.key});
-  final Function onTap;
-  @override
-  State<AddExercise> createState() => _AddExerciseState();
-}
-
-class _AddExerciseState extends State<AddExercise> {
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      style: IconButton.styleFrom(side: BorderSide(color: Colors.grey)),
-      onPressed: () => widget.onTap(),
-      icon: Icon(Icons.add, color: Colors.grey),
     );
   }
 }
