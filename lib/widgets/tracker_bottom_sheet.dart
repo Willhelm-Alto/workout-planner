@@ -1,15 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gym_tracker/workout.dart';
 
-class MainBotomSheet extends StatefulWidget {
-  const MainBotomSheet({super.key});
+class TrackerBottomSheet extends StatefulWidget {
+  const TrackerBottomSheet({required this.current, required this.onTap, super.key});
+  final Exercise? current;
+  final Function onTap;
 
   @override
-  State<MainBotomSheet> createState() => _MainBotomSheetState();
+  State<TrackerBottomSheet> createState() => _TrackerBottomSheetState();
 }
 
-class _MainBotomSheetState extends State<MainBotomSheet> {
+class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
   bool _isTimer = false;
   int _secondsLeft = 10;
   Timer? _timer;
@@ -21,6 +24,10 @@ class _MainBotomSheetState extends State<MainBotomSheet> {
   }
 
   void _toggleTimer() {
+    if(widget.current == null){
+      widget.onTap();
+    }
+
     if (_isTimer) {
       _timer?.cancel();
       setState(() {
@@ -70,7 +77,7 @@ class _MainBotomSheetState extends State<MainBotomSheet> {
                 shape: const CircleBorder(),
                 padding: const EdgeInsets.all(24),
               ),
-              child: _isTimer ? Text("$_secondsLeft") : Icon(Icons.check),
+              child: widget.current == null ? Text("INICIAR") : _isTimer ? Text("$_secondsLeft") : Icon(Icons.check),
             ),
             ElevatedButton(
               onPressed: () {},

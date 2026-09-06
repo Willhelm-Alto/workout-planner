@@ -33,7 +33,7 @@ enum DayOfWeek {
 }
 
 extension on DayOfWeek {
-  int compareTo(DayOfWeek other) => this.index.compareTo(other.index);
+  int compareTo(DayOfWeek other) => index.compareTo(other.index);
 }
 
 class Workout {

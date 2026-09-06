@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/pages/workout_tracker_page.dart';
+import 'package:gym_tracker/pages/tracker_page.dart';
 import 'package:gym_tracker/widgets/exercise_card.dart';
 import 'package:gym_tracker/workout.dart';
 import 'package:table_calendar/table_calendar.dart';
