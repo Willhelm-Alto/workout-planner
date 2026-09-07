@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/pages/edit_workout.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/pages/edit_workout.dart';
+import 'package:workout_planner/workout.dart';
 
 class WorkoutPage extends StatelessWidget {
   WorkoutPage({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/widgets/tracker_bottom_sheet.dart';
-import 'package:gym_tracker/widgets/exercise_card.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/widgets/tracker_bottom_sheet.dart';
+import 'package:workout_planner/widgets/exercise_card.dart';
+import 'package:workout_planner/workout.dart';
 
 class TrackerPage extends StatefulWidget {
   const TrackerPage({required this.workout, super.key});
@@ -66,6 +66,10 @@ class _TrackerPageState extends State<TrackerPage> {
           itemBuilder: (_, i) => ExerciseCard(
             exercise: widget.workout.exercises[i],
             index: i,
+            customBorder:
+                current != null && current! == widget.workout.exercises[i]
+                ? BorderSide(color: Colors.blue, width: 2)
+                : null,
             tracker: Switch(value: false, onChanged: (value) {}),
           ),
         ),

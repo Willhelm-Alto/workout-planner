@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/workout.dart';
 
 class ExerciseCard extends StatelessWidget {
-  const ExerciseCard({required this.exercise, required this.index, this.tracker, super.key});
+  const ExerciseCard({required this.exercise, required this.index, this.tracker, this.customBorder, super.key});
   final Exercise exercise;
   final int index;
   final Widget? tracker;
+  final BorderSide? customBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class ExerciseCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: customBorder != null ? customBorder! : BorderSide(color: Colors.grey.shade300),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),

@@ -1,6 +1,6 @@
 {
-    "name": "gym_tracker",
-    "short_name": "gym_tracker",
+    "name": "workout_planner",
+    "short_name": "workout_planner",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/pages/tracker_page.dart';
-import 'package:gym_tracker/widgets/exercise_card.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/pages/tracker_page.dart';
+import 'package:workout_planner/widgets/exercise_card.dart';
+import 'package:workout_planner/workout.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {

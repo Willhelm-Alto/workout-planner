@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/pages/edit_workout.dart';
-import 'package:gym_tracker/pages/home_page.dart';
-import 'package:gym_tracker/pages/workouts_page.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/pages/edit_workout.dart';
+import 'package:workout_planner/pages/home_page.dart';
+import 'package:workout_planner/pages/workouts_page.dart';
+import 'package:workout_planner/workout.dart';
 
 void main() {
   runApp(const MyApp());

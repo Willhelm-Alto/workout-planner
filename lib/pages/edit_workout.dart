@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gym_tracker/widgets/new_exercise.dart';
-import 'package:gym_tracker/workout.dart';
+import 'package:workout_planner/widgets/new_exercise.dart';
+import 'package:workout_planner/workout.dart';
 import 'package:uuid/uuid.dart';
 
 class EditWorkout extends StatefulWidget {

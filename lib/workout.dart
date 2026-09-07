@@ -181,6 +181,7 @@ class WorkoutManager extends ChangeNotifier{
         workoutFile.writeAsStringSync(jsonEncode(""));
       }
       wasInitialized = true;
+      notifyListeners();
     }
     return;
   }
