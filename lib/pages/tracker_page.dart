@@ -59,7 +59,7 @@ class _TrackerPageState extends State<TrackerPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.workout.title)),
+        appBar: AppBar(title: Text(widget.workout.title),actions: [Text('')],),
         body: ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: widget.workout.exercises.length,
@@ -70,16 +70,25 @@ class _TrackerPageState extends State<TrackerPage> {
                 current != null && current! == widget.workout.exercises[i]
                 ? BorderSide(color: Colors.blue, width: 2)
                 : null,
-            tracker: Switch(value: false, onChanged: (value) {}),
+            tracker: Switch(value: doneExercisesList[widget.workout.exercises[i]]!, onChanged: (value) {}),
           ),
         ),
         bottomSheet: TrackerBottomSheet(
+          key: ValueKey(current),
           current: current,
-          onTap: () => setState(
+          init: () => setState(
             () => current = doneExercisesList.entries
                 .firstWhere((element) => !element.value)
                 .key,
           ),
+          onFinishExercise: (e){
+            setState((){
+              doneExercisesList[e] = true;
+              current = doneExercisesList.entries
+                .firstWhere((element) => !element.value)
+                .key;
+            });
+          },
         ),
       ),
     );

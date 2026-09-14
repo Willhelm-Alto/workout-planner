@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:workout_planner/workout.dart';
 
 class TrackerBottomSheet extends StatefulWidget {
-  const TrackerBottomSheet({required this.current, required this.onTap, super.key});
+  const TrackerBottomSheet({
+    required this.current,
+    required this.init,
+    required this.onFinishExercise,
+    super.key,
+  });
   final Exercise? current;
-  final Function onTap;
+  final Function init;
+  final Function(Exercise e) onFinishExercise;
 
   @override
   State<TrackerBottomSheet> createState() => _TrackerBottomSheetState();
@@ -14,9 +20,9 @@ class TrackerBottomSheet extends StatefulWidget {
 
 class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
   bool _isTimer = false;
-  int _secondsLeft = 10;
+  int _secondsLeft = 0;
+  int currentSet = 1;
   Timer? _timer;
-  int currentSet = 0;
 
   @override
   void dispose() {
@@ -25,85 +31,142 @@ class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
   }
 
   void _toggleTimer() {
-    if(widget.current == null){
-      widget.onTap();
+    if (widget.current == null) {
+      widget.init();
       return;
     }
 
     if (_isTimer) {
       _timer?.cancel();
-      setState(() {
-        _timer = null;
-        _isTimer = false;
-      });
+      setState(() => finishTimer());
       return;
     }
 
     setState(() {
       _isTimer = true;
-      _secondsLeft = 10;
+      _secondsLeft = widget.current!.restTime;
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
           _secondsLeft--;
           if (_secondsLeft == 0) {
             timer.cancel();
-            _timer = null;
-            _isTimer = false;
+            finishTimer();
           }
         });
       });
     });
   }
 
+  finishTimer() {
+    _timer = null;
+    _isTimer = false;
+    currentSet++;
+    if(currentSet > widget.current!.set){
+      widget.onFinishExercise(widget.current!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final current = widget.current;
     return BottomSheet(
-      constraints: const BoxConstraints(maxHeight: 100),
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.blue.shade600,
       onClosing: () {},
       builder: (context) {
-        return Column(
-          children: [
-            if(widget.current != null)
-            SizedBox(
-              height: 20,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(widget.current!.title)
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(8),
+                if (current != null) ...[
+                  Text(
+                    current.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
-                  child: Icon(Icons.arrow_left),
-                ),
-                ElevatedButton(
-                  onPressed: _toggleTimer,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(24),
+                  Text(
+                    current.byTime
+                        ? "${current.duration}s"
+                        : "$currentSet/${current.set}",
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                  child: widget.current == null ? Text("INICIAR") : _isTimer ? Text("$_secondsLeft") : Icon(Icons.check),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(5),
-                  ),
-                  child: Icon(Icons.arrow_right),
+                  SizedBox(height: 8),
+                ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      color: Colors.white,
+                      icon: Icon(Icons.arrow_left),
+                    ),
+                    SizedBox(width: 24),
+                    SizedBox(
+                      width: 64,
+                      height: 64,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (_isTimer)
+                            SizedBox.expand(
+                              child: CircularProgressIndicator(
+                                value: _secondsLeft / current!.restTime,
+                                strokeWidth: 3,
+                                backgroundColor: Colors.white24,
+                                valueColor: AlwaysStoppedAnimation(
+                                  Colors.white,
+                                ),
+                              ),
+                            ),
+                          ElevatedButton(
+                            onPressed: _toggleTimer,
+                            style: ElevatedButton.styleFrom(
+                              shape: const CircleBorder(),
+                              padding: EdgeInsets.zero,
+                              elevation: 0,
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.blue.shade700,
+                              fixedSize: const Size(52, 52),
+                            ),
+                            child: current == null
+                                ? const Text(
+                                    "INICIAR",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  )
+                                : _isTimer
+                                ? Text(
+                                    "$_secondsLeft",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                : const Icon(Icons.check),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.arrow_right),
+                      color: Colors.white,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         );
       },
     );
