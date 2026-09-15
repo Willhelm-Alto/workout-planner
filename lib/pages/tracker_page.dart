@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:workout_planner/widgets/tracker_bottom_sheet.dart';
 import 'package:workout_planner/widgets/exercise_card.dart';
@@ -15,6 +17,16 @@ class TrackerPage extends StatefulWidget {
 class _TrackerPageState extends State<TrackerPage> {
   Map<Exercise, bool> doneExercisesList = {};
   Exercise? current;
+  final stopwatch = Stopwatch();
+  Timer? ticker;
+  
+  String get stopwatchStr{
+    final e = stopwatch.elapsed;
+    final h = e.inHours.toString().padLeft(2, '0');
+    final m = (e.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (e.inSeconds % 60).toString().padLeft(2, '0');
+    return "$h:$m:$s";
+  }
 
   @override
   void initState() {
@@ -22,6 +34,12 @@ class _TrackerPageState extends State<TrackerPage> {
     for (final e in widget.workout.exercises) {
       doneExercisesList[e] = false;
     }
+  }
+
+  @override
+  void dispose() {
+    ticker?.cancel();
+    super.dispose();
   }
 
   Future<bool> closeConfirmationDialog() async {
@@ -45,7 +63,6 @@ class _TrackerPageState extends State<TrackerPage> {
     return res ?? false;
   }
 
-  //TODO: TERMINAR A FUNCIONALIDADE DESSA PÁGINA
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -59,7 +76,10 @@ class _TrackerPageState extends State<TrackerPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.workout.title),actions: [Text('')],),
+        appBar: AppBar(
+          title: Text(widget.workout.title),
+          actions: [Icon(Icons.access_alarm), Text(stopwatchStr)],
+        ),
         body: ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: widget.workout.exercises.length,
@@ -70,23 +90,28 @@ class _TrackerPageState extends State<TrackerPage> {
                 current != null && current! == widget.workout.exercises[i]
                 ? BorderSide(color: Colors.blue, width: 2)
                 : null,
-            tracker: Switch(value: doneExercisesList[widget.workout.exercises[i]]!, onChanged: (value) {}),
+            tracker: Switch(
+              value: doneExercisesList[widget.workout.exercises[i]]!,
+              onChanged: (value) {},
+            ),
           ),
         ),
         bottomSheet: TrackerBottomSheet(
           key: ValueKey(current),
           current: current,
-          init: () => setState(
-            () => current = doneExercisesList.entries
-                .firstWhere((element) => !element.value)
-                .key,
-          ),
-          onFinishExercise: (e){
-            setState((){
-              doneExercisesList[e] = true;
-              current = doneExercisesList.entries
+          init: () => setState(() {
+            current = doneExercisesList.entries
                 .firstWhere((element) => !element.value)
                 .key;
+            stopwatch.start();
+            ticker ??= Timer.periodic(Duration(seconds: 1), (_) => setState((){}));
+          }),
+          onFinishExercise: (e) {
+            setState(() {
+              doneExercisesList[e] = true;
+              current = doneExercisesList.entries
+                  .firstWhere((element) => !element.value)
+                  .key;
             });
           },
         ),

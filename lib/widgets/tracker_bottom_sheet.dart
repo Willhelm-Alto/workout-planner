@@ -82,7 +82,7 @@ class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
               children: [
                 if (current != null) ...[
                   Text(
-                    current.title,
+                    current.title.toUpperCase(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -95,13 +95,14 @@ class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
                     current.byTime
                         ? "${current.duration}s"
                         : "$currentSet/${current.set}",
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   SizedBox(height: 8),
                 ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    //TODO: Implementar os botões para pular os exercícios
                     IconButton(
                       onPressed: () {},
                       color: Colors.white,
