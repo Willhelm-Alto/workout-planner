@@ -105,7 +105,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
     });
   }
 
-  finishTimer() {
+  void finishTimer() {
     _timer = null;
     _isTimer = false;
     currentSet++;
@@ -178,14 +178,14 @@ class _ExecutionPageState extends State<ExecutionPage> {
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
                             labelStyle: TextStyle(),
-                            label: Text('${current.set} set'),
+                            label: Text('${current.set} sets'),
                           ),
                           Chip(
                             backgroundColor: Colors.blue.shade50,
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
                             labelStyle: TextStyle(),
-                            label: Text('${current.restTime} rest'),
+                            label: Text('${current.restTime}s rest'),
                           ),
                         ],
                       ),
@@ -260,17 +260,26 @@ class _ExecutionPageState extends State<ExecutionPage> {
                                     child: TextField(
                                       controller: weightController,
                                       decoration: InputDecoration(
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                            ),
                                         suffixText: "kg",
                                       ),
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {},
+                                    onPressed: () {}, //TODO: Permitir salvar o peso
                                     style: TextButton.styleFrom(
                                       backgroundColor: Colors.blue,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
-                                      padding: const EdgeInsets.symmetric(vertical: 14)
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(8),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 14,
+                                      ),
                                     ),
                                     child: Text(
                                       "Save",
@@ -283,89 +292,101 @@ class _ExecutionPageState extends State<ExecutionPage> {
                           ),
                         ),
                       ),
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (_isTimer)
-                            SizedBox(
-                              width: 108,
-                              height: 108,
-                              child: CircularProgressIndicator(
-                                value: _secondsLeft / current.restTime,
-                                strokeWidth: 3,
-                                backgroundColor: Colors.blue.shade50,
-                                valueColor: AlwaysStoppedAnimation(Colors.blue),
-                              ),
-                            ),
-                          ElevatedButton(
-                            onPressed: _toggleTimer,
-                            style: ElevatedButton.styleFrom(
-                              shape: const CircleBorder(),
-                              padding: EdgeInsets.all(10),
-                              elevation: 0,
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                              fixedSize: const Size(92, 92),
-                            ),
-                            child: !workoutStarted
-                                ? Text("START")
-                                : _isTimer
-                                ? Text(
-                                    "$_secondsLeft",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                : const Icon(Icons.check),
-                          ),
-                        ],
-                      ),
+                      _buildObservation()
                     ],
                   ),
                 ),
               ),
+              _buildMainButton(),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _buildObservation() {
+    //TODO: Permitir editar observação
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 6,
+          children: [
+            Row(
+              spacing: 6,
+              children: [
+                Icon(Icons.list_alt, size: 16),
+                Expanded(child: Text("Note")),
+                IconButton(onPressed: () {}, icon: Icon(Icons.edit, size: 16)),
+              ],
+            ),
+            TextFormField(
+              minLines: 3,
+              maxLines: 5,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainButton() {
+    return Container(
+      decoration: BoxDecoration(
+        border: BoxBorder.fromLTRB(
+          top: BorderSide(color: Colors.grey.shade300),
+        ),
+      ),
+      padding: EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              if (_isTimer)
+                SizedBox(
+                  width: 108,
+                  height: 108,
+                  child: CircularProgressIndicator(
+                    value: _secondsLeft / current.restTime,
+                    strokeWidth: 3,
+                    backgroundColor: Colors.blue.shade50,
+                    valueColor: AlwaysStoppedAnimation(Colors.blue),
+                  ),
+                ),
+              ElevatedButton(
+                onPressed: _toggleTimer,
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: EdgeInsets.all(10),
+                  elevation: 0,
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  fixedSize: const Size(92, 92),
+                ),
+                child: !workoutStarted
+                    ? Text("START")
+                    : _isTimer
+                    ? Text(
+                        "$_secondsLeft",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    : const Icon(Icons.check),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-
-// body: ListView.builder(
-        //   padding: const EdgeInsets.all(16),
-        //   itemCount: widget.workout.exercises.length,
-        //   itemBuilder: (_, i) => ExerciseCard(
-        //     exercise: widget.workout.exercises[i],
-        //     index: i,
-        //     customBorder:
-        //         current != null && current! == widget.workout.exercises[i]
-        //         ? BorderSide(color: Colors.blue, width: 2)
-        //         : null,
-        //     tracker: Switch(
-        //       value: doneExercisesList[widget.workout.exercises[i]]!,
-        //       onChanged: (value) {},
-        //     ),
-        //   ),
-        // ),
-        // bottomSheet: TrackerBottomSheet(
-        //   key: ValueKey(current),
-        //   current: current,
-        //   init: () => setState(() {
-        //     current = doneExercisesList.entries
-        //         .firstWhere((element) => !element.value)
-        //         .key;
-        //     stopwatch.start();
-        //     ticker ??= Timer.periodic(Duration(seconds: 1), (_) => setState((){}));
-        //   }),
-        //   onFinishExercise: (e) {
-        //     setState(() {
-        //       doneExercisesList[e] = true;
-        //       current = doneExercisesList.entries
-        //           .firstWhere((element) => !element.value)
-        //           .key;
-        //     });
-        //   },
-        // ),

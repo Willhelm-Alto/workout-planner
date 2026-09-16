@@ -213,7 +213,7 @@ class _NewExerciseState extends State<NewExercise> {
                   child: TextFormField(
                     controller: observationController,
                     minLines: 3,
-                    maxLines: 3,
+                    maxLines: 5,
                     keyboardType: TextInputType.multiline,
                     onChanged: (value) => widget.exercise.observation = value,
                     decoration: InputDecoration(
