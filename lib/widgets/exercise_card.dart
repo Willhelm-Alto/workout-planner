@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 
 class ExerciseCard extends StatelessWidget {
   const ExerciseCard({required this.exercise, required this.index, this.tracker, this.customBorder, super.key});

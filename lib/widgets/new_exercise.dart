@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 
 class NewExercise extends StatefulWidget {
   const NewExercise({

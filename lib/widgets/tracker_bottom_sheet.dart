@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 
 class TrackerBottomSheet extends StatefulWidget {
   const TrackerBottomSheet({

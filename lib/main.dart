@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_planner/pages/edit_workout.dart';
+import 'package:workout_planner/pages/edit_workout_page.dart';
 import 'package:workout_planner/pages/home_page.dart';
 import 'package:workout_planner/pages/workouts_page.dart';
-import 'package:workout_planner/workout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,14 +55,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Seu Treino"),
+        title: Text("Workout Planner"),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () async {
-            final manager = WorkoutManager();
-            await manager.printFile();
-            // await manager.nukeEverything();
-          }, icon: Icon(Icons.delete))
+          // IconButton(onPressed: () async {
+          //   final manager = WorkoutManager();
+          //   await manager.printFile();
+          //   // await manager.nukeEverything();
+          // }, icon: Icon(Icons.delete))
         ],
       ),
       body: _pages.elementAt(_pageIndex),

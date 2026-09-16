@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_planner/pages/tracker_page.dart';
+import 'package:workout_planner/pages/execution_page.dart';
 import 'package:workout_planner/widgets/exercise_card.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
@@ -137,7 +137,7 @@ class HomePageState extends State<HomePage> {
                     onPressed: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => TrackerPage(workout: workout),
+                              builder: (_) => ExecutionPage(workout: workout),
                             ),
                           ),
                     style: TextButton.styleFrom(
@@ -153,7 +153,7 @@ class HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "INICIAR",
+                          "START",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

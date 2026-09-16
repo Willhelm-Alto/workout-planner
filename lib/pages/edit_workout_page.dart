@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workout_planner/widgets/new_exercise.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 import 'package:uuid/uuid.dart';
 
 class EditWorkout extends StatefulWidget {
@@ -43,7 +43,7 @@ class EditWorkoutState extends State<EditWorkout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(isNew ? "Novo Treino" : "Editar Treino")),
+      appBar: AppBar(title: Text(isNew ? "New Workout" : "Edit Workout")),
       body: Form(
         key: _formKey,
         child: ReorderableListView(
@@ -125,7 +125,7 @@ class EditWorkoutState extends State<EditWorkout> {
                         child: Divider(),
                       ),
                     ),
-                    Text("Exercícios", style: TextStyle(color: Colors.grey)),
+                    Text("Exercises", style: TextStyle(color: Colors.grey)),
                     Expanded(
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 10),
