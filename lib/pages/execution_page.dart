@@ -129,61 +129,139 @@ class _ExecutionPageState extends State<ExecutionPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.workout.title),
-          actions: [Icon(Icons.access_alarm), Text(stopwatchStr)],
+          actions: [
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(right: 16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 6,
+                  children: [Icon(Icons.timer_outlined), Text(stopwatchStr)],
+                ),
+              ),
+            ),
+          ],
         ),
-        body: Column(
-          children: [
-            Text(
-              current.title.toUpperCase(),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+            child: Column(
+              spacing: 12,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${current.set}"),
-                Text("${current.restTime}")
-              ],
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                if (_isTimer)
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(
-                      value: _secondsLeft / current.restTime,
-                      strokeWidth: 3,
-                      backgroundColor: Colors.white24,
-                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                Text(
+                  current.title.toUpperCase(),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Chip(
+                      backgroundColor: Colors.blue.shade50,
+                      side: BorderSide.none,
+                      visualDensity: VisualDensity.compact,
+                      labelStyle: TextStyle(),
+                      label: Text('${current.repetitions} reps'),
+                    ),
+                    Chip(
+                      backgroundColor: Colors.blue.shade50,
+                      side: BorderSide.none,
+                      visualDensity: VisualDensity.compact,
+                      labelStyle: TextStyle(),
+                      label: Text('${current.set} set'),
+                    ),
+                    Chip(
+                      backgroundColor: Colors.blue.shade50,
+                      side: BorderSide.none,
+                      visualDensity: VisualDensity.compact,
+                      labelStyle: TextStyle(),
+                      label: Text('${current.restTime} rest'),
+                    ),
+                  ],
+                ),
+                Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 8,
+                      children: [
+                        Text("Set ${currentSet} of ${current.set}"),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 6,
+                          children: List.generate(current.set, (i) {
+                            final done = i < currentSet - 1;
+                            final active = i == currentSet - 1;
+                            return Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: done ? Colors.blue : Colors.transparent,
+                                border: Border.all(
+                                  width: 2,
+                                  color: done || active
+                                      ? Colors.blue
+                                      : Colors.grey.shade500,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
                     ),
                   ),
-                ElevatedButton(
-                  onPressed: _toggleTimer,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    padding: EdgeInsets.zero,
-                    elevation: 0,
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue.shade700,
-                    fixedSize: const Size(52, 52),
-                  ),
-                  child: !workoutStarted
-                      ? Text("START")
-                      : _isTimer
-                      ? Text(
-                          "$_secondsLeft",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      : const Icon(Icons.check),
+                ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (_isTimer)
+                      SizedBox(
+                        width: 108,
+                        height: 108,
+                        child: CircularProgressIndicator(
+                          value: _secondsLeft / current.restTime,
+                          strokeWidth: 3,
+                          backgroundColor: Colors.blue.shade50,
+                          valueColor: AlwaysStoppedAnimation(Colors.blue),
+                        ),
+                      ),
+                    ElevatedButton(
+                      onPressed: _toggleTimer,
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        padding: EdgeInsets.all(10),
+                        elevation: 0,
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        fixedSize: const Size(92, 92),
+                      ),
+                      child: !workoutStarted
+                          ? Text("START")
+                          : _isTimer
+                          ? Text(
+                              "$_secondsLeft",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            )
+                          : const Icon(Icons.check),
+                    ),
+                  ],
                 ),
               ],
             ),
-            
-          ],
+          ),
         ),
       ),
     );
@@ -226,43 +304,3 @@ class _ExecutionPageState extends State<ExecutionPage> {
         //     });
         //   },
         // ),
-
-/*
-┌──────────────────────────────────────────┐
-│  ←   Treino A               ⧗ 00:12:34   │  AppBar azul (tema)
-├──────────────────────────────────────────┤
-│                                          │
-│  Exercício 2 de 5         1 concluídos   │  cinza 13px
-│  ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │  barra 6px, raio total
-│                                          │
-│  SUPINO RETO                             │  26px w700
-│                                          │
-│  ╭─────────╮ ╭──────────╮ ╭────────────╮ │  chips pill
-│  │ 12 reps │ │ 3 séries │ │ 30s descan.│ │  bg blue.50 / txt blue.700
-│  ╰─────────╯ ╰──────────╯ ╰────────────╯ │
-│                                          │
-│  ┌────────────────────────────────────┐  │  card: borda grey.300
-│  │  Série 2 de 3            ●  ◉  ○   │  │  ● feita ◉ atual ○ futura
-│  └────────────────────────────────────┘  │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │  ⚖  Carga                          │  │
-│  │  ┌────────────────────┐ ┌────────┐ │  │  ← campo editável
-│  │  │ 40             kg  │ │ Salvar │ │  │  botão só ativa se mudou
-│  │  └────────────────────┘ └────────┘ │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  ╔════════════════════════════════════╗  │  sem borda, fundo blue.50
-│  ║  ▤  OBSERVAÇÃO                     ║  │  ← some se estiver vazia
-│  ║     Descer devagar, 2s na negativa ║  │
-│  ╚════════════════════════════════════╝  │
-│                                          │
-├──────────────────────────────────────────┤  borda superior grey.200
-│               ╭ ─ ─ ─ ─ ─ ╮              │  anel 108px = progresso
-│             ╱   ╭───────╮   ╲            │  do descanso, drenando
-│            │    │  18   │    │           │  botão 92px azul sólido
-│             ╲   ╰───────╯   ╱            │
-│               ╰ ─ ─ ─ ─ ─ ╯              │
-│        Descanso · toque para pular       │  legenda cinza 13px
-└──────────────────────────────────────────┘
-*/
