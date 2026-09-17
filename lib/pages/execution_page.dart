@@ -14,14 +14,21 @@ class ExecutionPage extends StatefulWidget {
 class _ExecutionPageState extends State<ExecutionPage> {
   Map<Exercise, bool> doneExercisesList = {};
   late Exercise current;
-  final stopwatch = Stopwatch();
+
   Timer? ticker;
-  Timer? _timer;
-  bool _isTimer = false;
-  int _secondsLeft = 0;
-  int currentSet = 1;
+  Timer? timer;
+
+  bool isTimer = false;
   bool workoutStarted = false;
+  bool editingNote = false;
+
+  int secondsLeft = 0;
+  int currentSet = 1;
+
   final weightController = TextEditingController();
+  final noteController = TextEditingController();
+  final stopwatch = Stopwatch();
+  final manager = WorkoutManager();
 
   String get stopwatchStr {
     final e = stopwatch.elapsed;
@@ -44,13 +51,18 @@ class _ExecutionPageState extends State<ExecutionPage> {
     current = doneExercisesList.entries.firstWhere((e) => !e.value).key;
     current.weight != null
         ? weightController.text = current.weight.toString()
-        : weightController.text = '-';
+        : weightController.text = "-";
+    current.observation != null
+        ? noteController.text = current.observation!
+        : noteController.text = "-";
   }
 
   @override
   void dispose() {
     ticker?.cancel();
-    _timer?.cancel();
+    timer?.cancel();
+    noteController.dispose();
+    weightController.dispose();
     super.dispose();
   }
 
@@ -84,19 +96,19 @@ class _ExecutionPageState extends State<ExecutionPage> {
       return;
     }
 
-    if (_isTimer) {
-      _timer?.cancel();
+    if (isTimer) {
+      timer?.cancel();
       setState(() => finishTimer());
       return;
     }
 
     setState(() {
-      _isTimer = true;
-      _secondsLeft = current.restTime;
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      isTimer = true;
+      secondsLeft = current.restTime;
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
-          _secondsLeft--;
-          if (_secondsLeft == 0) {
+          secondsLeft--;
+          if (secondsLeft == 0) {
             timer.cancel();
             finishTimer();
           }
@@ -106,8 +118,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   void finishTimer() {
-    _timer = null;
-    _isTimer = false;
+    timer = null;
+    isTimer = false;
     currentSet++;
     if (currentSet > current.set) {
       setState(() {
@@ -269,7 +281,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () {}, //TODO: Permitir salvar o peso
+                                    onPressed:
+                                        () {}, //TODO: Permitir salvar o peso
                                     style: TextButton.styleFrom(
                                       backgroundColor: Colors.blue,
                                       shape: RoundedRectangleBorder(
@@ -292,7 +305,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
                           ),
                         ),
                       ),
-                      _buildObservation()
+                      _buildObservation(),
                     ],
                   ),
                 ),
@@ -321,15 +334,48 @@ class _ExecutionPageState extends State<ExecutionPage> {
               children: [
                 Icon(Icons.list_alt, size: 16),
                 Expanded(child: Text("Note")),
-                IconButton(onPressed: () {}, icon: Icon(Icons.edit, size: 16)),
+                IconButton(
+                  onPressed: () {
+                    setState(() => editingNote = !editingNote);
+                  },
+                  icon: Icon(Icons.edit, size: 16),
+                ),
               ],
             ),
-            TextFormField(
+            TextField(
+              controller: noteController,
+              readOnly: !editingNote,
               minLines: 3,
-              maxLines: 5,
+              maxLines: null,
               keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(10),
+                enabledBorder: editingNote ? OutlineInputBorder() : InputBorder.none,
+                focusedBorder: editingNote ? null : InputBorder.none,
+              ),
             ),
+            if (editingNote)
+              Row(
+                spacing: 8,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => setState(() => editingNote = false),
+                    child: Text("Cancel", style: TextStyle(color: Colors.blue)),
+                  ),
+                  TextButton(
+                    onPressed: (){},
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text("Save", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -350,12 +396,12 @@ class _ExecutionPageState extends State<ExecutionPage> {
           Stack(
             alignment: Alignment.center,
             children: [
-              if (_isTimer)
+              if (isTimer)
                 SizedBox(
                   width: 108,
                   height: 108,
                   child: CircularProgressIndicator(
-                    value: _secondsLeft / current.restTime,
+                    value: secondsLeft / current.restTime,
                     strokeWidth: 3,
                     backgroundColor: Colors.blue.shade50,
                     valueColor: AlwaysStoppedAnimation(Colors.blue),
@@ -373,9 +419,9 @@ class _ExecutionPageState extends State<ExecutionPage> {
                 ),
                 child: !workoutStarted
                     ? Text("START")
-                    : _isTimer
+                    : isTimer
                     ? Text(
-                        "$_secondsLeft",
+                        "$secondsLeft",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
