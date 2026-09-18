@@ -57,7 +57,7 @@ class _TrackerBottomSheetState extends State<TrackerBottomSheet> {
     });
   }
 
-  finishTimer() {
+  void finishTimer() {
     _timer = null;
     _isTimer = false;
     currentSet++;

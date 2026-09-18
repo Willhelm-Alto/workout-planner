@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:workout_planner/workout_manager.dart';
 
 class ExecutionPage extends StatefulWidget {
@@ -20,7 +21,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
   bool isTimer = false;
   bool workoutStarted = false;
-  bool editingNote = false;
+  bool isEditingNote = false;
 
   int secondsLeft = 0;
   int currentSet = 1;
@@ -52,9 +53,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
     current.weight != null
         ? weightController.text = current.weight.toString()
         : weightController.text = "-";
-    current.observation != null
-        ? noteController.text = current.observation!
-        : noteController.text = "-";
+    setNoteController();
   }
 
   @override
@@ -65,6 +64,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
     weightController.dispose();
     super.dispose();
   }
+
+  void setNoteController() => current.observation != null
+      ? noteController.text = current.observation!
+      : noteController.text = "-";
 
   Future<bool> closeConfirmationDialog() async {
     final res = await showDialog(
@@ -128,6 +131,31 @@ class _ExecutionPageState extends State<ExecutionPage> {
             .firstWhere((element) => !element.value)
             .key;
       });
+    }
+  }
+
+  Future<void> saveWeight() async {
+    FocusScope.of(context).unfocus();
+    final text = weightController.text;
+    int? newWeight = text.isEmpty ? null : int.parse(text);
+    if (newWeight != current.weight) {
+      setState(() => current.weight = newWeight);
+      await manager.editWorkout(widget.workout);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Weight Saved"), duration: Duration(seconds: 1)),
+      );
+    }
+  }
+
+  Future<void> saveNote() async {
+    FocusScope.of(context).unfocus();
+    final newNote = noteController.text;
+    if (newNote != current.observation) {
+      setState(() => current.observation = newNote);
+      await manager.editWorkout(widget.workout);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Note Saved"), duration: Duration(seconds: 1)),
+      );
     }
   }
 
@@ -271,6 +299,15 @@ class _ExecutionPageState extends State<ExecutionPage> {
                                   Expanded(
                                     child: TextField(
                                       controller: weightController,
+                                      onSubmitted: (_) => saveWeight(),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                      ],
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                            decimal: false,
+                                            signed: false,
+                                          ),
                                       decoration: InputDecoration(
                                         contentPadding:
                                             const EdgeInsets.symmetric(
@@ -281,8 +318,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed:
-                                        () {}, //TODO: Permitir salvar o peso
+                                    onPressed: () => saveWeight(),
                                     style: TextButton.styleFrom(
                                       backgroundColor: Colors.blue,
                                       shape: RoundedRectangleBorder(
@@ -319,7 +355,6 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget _buildObservation() {
-    //TODO: Permitir editar observação
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -335,36 +370,41 @@ class _ExecutionPageState extends State<ExecutionPage> {
                 Icon(Icons.list_alt, size: 16),
                 Expanded(child: Text("Note")),
                 IconButton(
-                  onPressed: () {
-                    setState(() => editingNote = !editingNote);
-                  },
+                  onPressed: () =>
+                      setState(() => isEditingNote = !isEditingNote),
+
                   icon: Icon(Icons.edit, size: 16),
                 ),
               ],
             ),
             TextField(
               controller: noteController,
-              readOnly: !editingNote,
-              minLines: 3,
+              readOnly: !isEditingNote,
+              minLines: 1,
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(10),
-                enabledBorder: editingNote ? OutlineInputBorder() : InputBorder.none,
-                focusedBorder: editingNote ? null : InputBorder.none,
+                enabledBorder: isEditingNote
+                    ? OutlineInputBorder()
+                    : InputBorder.none,
+                focusedBorder: isEditingNote ? null : InputBorder.none,
               ),
             ),
-            if (editingNote)
+            if (isEditingNote)
               Row(
                 spacing: 8,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () => setState(() => editingNote = false),
+                    onPressed: () => setState((){
+                        setNoteController();
+                        isEditingNote = false;
+                      }),
                     child: Text("Cancel", style: TextStyle(color: Colors.blue)),
                   ),
                   TextButton(
-                    onPressed: (){},
+                    onPressed: () => saveNote(),
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(

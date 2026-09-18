@@ -218,6 +218,7 @@ class WorkoutManager extends ChangeNotifier{
     edit.title = w.title;
     edit.day = w.day;
     edit.exercises = w.exercises;
+    edit.timeOfDay = w.timeOfDay;
 
     await saveWorkout(edit);
   }
