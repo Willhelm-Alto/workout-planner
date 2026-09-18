@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:workout_planner/widgets/execution_page_card.dart';
+import 'package:workout_planner/widgets/execution_page_chip.dart';
 import 'package:workout_planner/workout_manager.dart';
 
 class ExecutionPage extends StatefulWidget {
@@ -24,6 +26,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   bool isTimer = false;
   bool workoutStarted = false;
   bool isEditingNote = false;
+  bool isWorkoutDone = false;
 
   int secondsLeft = 0;
   int currentSet = 1;
@@ -133,7 +136,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
           currentIndex++;
           setWeightController();
           setNoteController();
-        } else {}
+        } else {
+          ticker?.cancel();
+          stopwatch.stop();
+          isWorkoutDone = true;
+        }
       });
     }
   }
@@ -181,7 +188,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: isWorkoutDone ? true : false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldClose = await closeConfirmationDialog();
@@ -206,164 +213,19 @@ class _ExecutionPageState extends State<ExecutionPage> {
           ],
         ),
         body: SafeArea(
-          child: Column(
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    spacing: 12,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 6,
-                          children: [
-                            Text(
-                              "Exercise ${currentIndex + 1} of ${widget.workout.exercises.length}",
-                            ),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(99),
-                              child: LinearProgressIndicator(
-                                minHeight: 6,
-                                backgroundColor: Colors.grey.shade200,
-                                color: Colors.blue,
-                                value:
-                                    doneExercisesList.length /
-                                    widget.workout.exercises.length,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        current.title.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          Chip(
-                            backgroundColor: Colors.blue.shade50,
-                            side: BorderSide.none,
-                            visualDensity: VisualDensity.compact,
-                            label: Text('${current.repetitions} reps'),
-                          ),
-                          Chip(
-                            backgroundColor: Colors.blue.shade50,
-                            side: BorderSide.none,
-                            visualDensity: VisualDensity.compact,
-                            label: Text('${current.set} sets'),
-                          ),
-                          Chip(
-                            backgroundColor: Colors.blue.shade50,
-                            side: BorderSide.none,
-                            visualDensity: VisualDensity.compact,
-                            label: Text('${current.restTime}s rest'),
-                          ),
-                        ],
-                      ),
-                      buildCard(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Set $currentSet of ${current.set}"),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 6,
-                              children: List.generate(current.set, (i) {
-                                final done = i < currentSet - 1;
-                                final active = i == currentSet - 1;
-                                return Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: done
-                                        ? Colors.blue
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      width: 2,
-                                      color: done || active
-                                          ? Colors.blue
-                                          : Colors.grey.shade500,
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ],
-                        ),
-                      ),
-                      buildCard(
-                        child: Column(
-                          spacing: 12,
-                          children: [
-                            Row(
-                              spacing: 6,
-                              children: [
-                                Icon(Icons.fitness_center, size: 16),
-                                Text("Weight"),
-                              ],
-                            ),
-                            Row(
-                              spacing: 12,
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: weightController,
-                                    onSubmitted: (_) => saveWeight(),
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                    keyboardType:
-                                        TextInputType.numberWithOptions(
-                                          decimal: false,
-                                          signed: false,
-                                        ),
-                                    decoration: InputDecoration(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                          ),
-                                      suffixText: "kg",
-                                    ),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () => saveWeight(),
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Save",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      _buildNoteField(),
-                    ],
-                  ),
+              executionBody(),
+              AnimatedSlide(
+                offset: isWorkoutDone ? Offset.zero : Offset(0, 1),
+                duration: Duration(milliseconds: 400),
+                curve: Curves.easeOutCubic,
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: finishedBody(),
                 ),
               ),
-              _buildMainButton(),
             ],
           ),
         ),
@@ -371,24 +233,176 @@ class _ExecutionPageState extends State<ExecutionPage> {
     );
   }
 
-  Widget buildCard({required Widget child}) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16),
-        child: child,
+  Widget finishedBody() {
+    //TODO: terminar essa tela
+    return Center(
+      child: Column(
+        spacing: 12,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+            ),
+            child: Icon(Icons.check, color: Colors.white),
+          ),
+          Text("Workout Complete!"),
+          Text("Total time: ${stopwatchStr}"),
+          TextButton(
+            onPressed: () {}, 
+            child: Text("Done")
+          ),
+        ],
       ),
     );
   }
 
+  Widget executionBody() {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              spacing: 12,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ExecutionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 6,
+                    children: [
+                      Text(
+                        "Exercise ${currentIndex + 1} of ${widget.workout.exercises.length}",
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(
+                          minHeight: 6,
+                          backgroundColor: Colors.grey.shade200,
+                          color: Colors.blue,
+                          value:
+                              doneExercisesList.length /
+                              widget.workout.exercises.length,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  current.title.toUpperCase(),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700),
+                ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ExecutionChip(text: '${current.repetitions} reps'),
+                    ExecutionChip(text: '${current.set} sets'),
+                    ExecutionChip(text: '${current.restTime}s rest'),
+                  ],
+                ),
+                ExecutionCard(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Set $currentSet of ${current.set}"),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 6,
+                        children: List.generate(current.set, (i) {
+                          final done = i < currentSet - 1;
+                          final active = i == currentSet - 1;
+                          return Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: done ? Colors.blue : Colors.transparent,
+                              border: Border.all(
+                                width: 2,
+                                color: done || active
+                                    ? Colors.blue
+                                    : Colors.grey.shade500,
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+                ExecutionCard(
+                  child: Column(
+                    spacing: 12,
+                    children: [
+                      Row(
+                        spacing: 6,
+                        children: [
+                          Icon(Icons.fitness_center, size: 16),
+                          Text("Weight"),
+                        ],
+                      ),
+                      Row(
+                        spacing: 12,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: weightController,
+                              onSubmitted: (_) => saveWeight(),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              keyboardType: TextInputType.numberWithOptions(
+                                decimal: false,
+                                signed: false,
+                              ),
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                suffixText: "kg",
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => saveWeight(),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                            child: Text(
+                              "Save",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                _buildNoteField(),
+              ],
+            ),
+          ),
+        ),
+        _buildMainButton(),
+      ],
+    );
+  }
+
   Widget _buildNoteField() {
-    //TODO: Mudar campo quando não houver observação
     final isNoteEmpty = noteController.text.isEmpty;
-    return buildCard(
+    return ExecutionCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 6,
@@ -430,21 +444,21 @@ class _ExecutionPageState extends State<ExecutionPage> {
                 ),
               ),
             ),
-          if(!isNoteEmpty || isEditingNote)
-          TextField(
-            controller: noteController,
-            readOnly: !isEditingNote,
-            minLines: 1,
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.all(10),
-              enabledBorder: isEditingNote
-                  ? OutlineInputBorder()
-                  : InputBorder.none,
-              focusedBorder: isEditingNote ? null : InputBorder.none,
+          if (!isNoteEmpty || isEditingNote)
+            TextField(
+              controller: noteController,
+              readOnly: !isEditingNote,
+              minLines: 1,
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(10),
+                enabledBorder: isEditingNote
+                    ? OutlineInputBorder()
+                    : InputBorder.none,
+                focusedBorder: isEditingNote ? null : InputBorder.none,
+              ),
             ),
-          ),
           if (isEditingNote)
             Row(
               spacing: 8,
