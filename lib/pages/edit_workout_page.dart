@@ -169,6 +169,12 @@ class EditWorkoutState extends State<EditWorkout> {
           child: TextButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
+                if(exercises.isEmpty){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Adicione exercícios nesse treino")),
+                  );
+                  return;
+                }
                 var workout = Workout(
                   id: isNew ? Uuid().v4() : widget.workout!.id,
                   title: _workoutNameController.text.toUpperCase(),

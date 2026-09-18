@@ -13,8 +13,10 @@ class ExecutionPage extends StatefulWidget {
 }
 
 class _ExecutionPageState extends State<ExecutionPage> {
-  Map<Exercise, bool> doneExercisesList = {};
-  late Exercise current;
+  //TODO: Mostrar lista de exercícios já feitos
+  //TODO: Finalizar o treino 
+  List<Exercise> doneExercisesList = [];
+  Exercise get current => widget.workout.exercises[currentIndex];
 
   Timer? ticker;
   Timer? timer;
@@ -25,6 +27,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
   int secondsLeft = 0;
   int currentSet = 1;
+  int currentIndex = 0;
 
   final weightController = TextEditingController();
   final noteController = TextEditingController();
@@ -46,13 +49,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
   @override
   void initState() {
     super.initState();
-    for (final e in widget.workout.exercises) {
-      doneExercisesList[e] = false;
-    }
-    current = doneExercisesList.entries.firstWhere((e) => !e.value).key;
-    current.weight != null
-        ? weightController.text = current.weight.toString()
-        : weightController.text = "-";
+    // for (final e in widget.workout.exercises) {
+    //   doneExercisesList[e] = false;
+    // }
+    // current = doneExercisesList.entries.firstWhere((e) => !e.value).key;
+    setWeightController();
     setNoteController();
   }
 
@@ -64,6 +65,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
     weightController.dispose();
     super.dispose();
   }
+
+  void setWeightController() => current.weight != null
+      ? weightController.text = current.weight.toString()
+      : weightController.text = "-";
 
   void setNoteController() => current.observation != null
       ? noteController.text = current.observation!
@@ -126,12 +131,33 @@ class _ExecutionPageState extends State<ExecutionPage> {
     currentSet++;
     if (currentSet > current.set) {
       setState(() {
-        doneExercisesList[current] = true;
-        current = doneExercisesList.entries
-            .firstWhere((element) => !element.value)
-            .key;
+        // doneExercisesList[current] = true;
+        // current = doneExercisesList.entries
+        //     .firstWhere((element) => !element.value)
+        //     .key;
+        currentSet = 1;
+        doneExercisesList.add(current);
+        if (doneExercisesList.length < widget.workout.exercises.length) {
+          currentIndex++;
+          setWeightController();
+          setNoteController();
+        } else {}
       });
     }
+  }
+
+  void goToExercise(int index) {
+    if (index < 0 || index >= widget.workout.exercises.length) return;
+    timer?.cancel();
+    setState(() {
+      timer = null;
+      isTimer = false;
+      currentIndex = index;
+      currentSet = 1;
+      isEditingNote = false;
+      setNoteController();
+      setWeightController();
+    });
   }
 
   Future<void> saveWeight() async {
@@ -196,6 +222,23 @@ class _ExecutionPageState extends State<ExecutionPage> {
                     spacing: 12,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      buildCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 6,
+                          children: [
+                            Text(
+                              "Exercise ${currentIndex + 1} of ${widget.workout.exercises.length}",
+                            ),
+                            LinearProgressIndicator(
+                              color: Colors.blue,
+                              value:
+                                  (currentIndex + 1) /
+                                  widget.workout.exercises.length,
+                            ),
+                          ],
+                        ),
+                      ),
                       Text(
                         current.title.toUpperCase(),
                         style: TextStyle(
@@ -229,119 +272,97 @@ class _ExecutionPageState extends State<ExecutionPage> {
                           ),
                         ],
                       ),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 16,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Set ${currentSet} of ${current.set}"),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 6,
-                                children: List.generate(current.set, (i) {
-                                  final done = i < currentSet - 1;
-                                  final active = i == currentSet - 1;
-                                  return Container(
-                                    width: 12,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: done
+                      buildCard(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Set $currentSet of ${current.set}"),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 6,
+                              children: List.generate(current.set, (i) {
+                                final done = i < currentSet - 1;
+                                final active = i == currentSet - 1;
+                                return Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: done
+                                        ? Colors.blue
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                      width: 2,
+                                      color: done || active
                                           ? Colors.blue
-                                          : Colors.transparent,
-                                      border: Border.all(
-                                        width: 2,
-                                        color: done || active
-                                            ? Colors.blue
-                                            : Colors.grey.shade500,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 16,
-                          ),
-                          child: Column(
-                            spacing: 12,
-                            children: [
-                              Row(
-                                spacing: 6,
-                                children: [
-                                  Icon(Icons.fitness_center, size: 16),
-                                  Text("Weight"),
-                                ],
-                              ),
-                              Row(
-                                spacing: 12,
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: weightController,
-                                      onSubmitted: (_) => saveWeight(),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                      ],
-                                      keyboardType:
-                                          TextInputType.numberWithOptions(
-                                            decimal: false,
-                                            signed: false,
-                                          ),
-                                      decoration: InputDecoration(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                            ),
-                                        suffixText: "kg",
-                                      ),
+                                          : Colors.grey.shade500,
                                     ),
                                   ),
-                                  TextButton(
-                                    onPressed: () => saveWeight(),
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8),
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                      buildCard(
+                        child: Column(
+                          spacing: 12,
+                          children: [
+                            Row(
+                              spacing: 6,
+                              children: [
+                                Icon(Icons.fitness_center, size: 16),
+                                Text("Weight"),
+                              ],
+                            ),
+                            Row(
+                              spacing: 12,
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: weightController,
+                                    onSubmitted: (_) => saveWeight(),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    keyboardType:
+                                        TextInputType.numberWithOptions(
+                                          decimal: false,
+                                          signed: false,
                                         ),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 14,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      "Save",
-                                      style: TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                          ),
+                                      suffixText: "kg",
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                                TextButton(
+                                  onPressed: () => saveWeight(),
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Save",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      _buildObservation(),
+                      _buildNoteField(),
                     ],
                   ),
                 ),
@@ -354,70 +375,75 @@ class _ExecutionPageState extends State<ExecutionPage> {
     );
   }
 
-  Widget _buildObservation() {
+  Widget buildCard({required Widget child}) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 6,
-          children: [
-            Row(
-              spacing: 6,
-              children: [
-                Icon(Icons.list_alt, size: 16),
-                Expanded(child: Text("Note")),
-                IconButton(
-                  onPressed: () =>
-                      setState(() => isEditingNote = !isEditingNote),
+        child: child,
+      ),
+    );
+  }
 
-                  icon: Icon(Icons.edit, size: 16),
+  Widget _buildNoteField() {
+    //TODO: Mudar campo quando não houver observação
+    return buildCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 6,
+        children: [
+          Row(
+            spacing: 6,
+            children: [
+              Icon(Icons.list_alt, size: 16),
+              Expanded(child: Text("Note")),
+              IconButton(
+                onPressed: () => setState(() => isEditingNote = !isEditingNote),
+                icon: Icon(Icons.edit, size: 16),
+              ),
+            ],
+          ),
+          TextField(
+            controller: noteController,
+            readOnly: !isEditingNote,
+            minLines: 1,
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(10),
+              enabledBorder: isEditingNote
+                  ? OutlineInputBorder()
+                  : InputBorder.none,
+              focusedBorder: isEditingNote ? null : InputBorder.none,
+            ),
+          ),
+          if (isEditingNote)
+            Row(
+              spacing: 8,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => setState(() {
+                    setNoteController();
+                    isEditingNote = false;
+                  }),
+                  child: Text("Cancel", style: TextStyle(color: Colors.blue)),
+                ),
+                TextButton(
+                  onPressed: () => saveNote(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: Text("Save", style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
-            TextField(
-              controller: noteController,
-              readOnly: !isEditingNote,
-              minLines: 1,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(10),
-                enabledBorder: isEditingNote
-                    ? OutlineInputBorder()
-                    : InputBorder.none,
-                focusedBorder: isEditingNote ? null : InputBorder.none,
-              ),
-            ),
-            if (isEditingNote)
-              Row(
-                spacing: 8,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => setState((){
-                        setNoteController();
-                        isEditingNote = false;
-                      }),
-                    child: Text("Cancel", style: TextStyle(color: Colors.blue)),
-                  ),
-                  TextButton(
-                    onPressed: () => saveNote(),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Text("Save", style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -431,45 +457,65 @@ class _ExecutionPageState extends State<ExecutionPage> {
       ),
       padding: EdgeInsets.all(10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              if (isTimer)
-                SizedBox(
-                  width: 108,
-                  height: 108,
-                  child: CircularProgressIndicator(
-                    value: secondsLeft / current.restTime,
-                    strokeWidth: 3,
-                    backgroundColor: Colors.blue.shade50,
-                    valueColor: AlwaysStoppedAnimation(Colors.blue),
+          IconButton(
+            onPressed: currentIndex > 0
+                ? () => goToExercise(currentIndex - 1)
+                : null,
+            icon: Icon(Icons.arrow_left, size: 50, color: Colors.grey.shade600),
+          ),
+          SizedBox(
+            width: 108,
+            height: 108,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (isTimer)
+                  SizedBox(
+                    width: 108,
+                    height: 108,
+                    child: CircularProgressIndicator(
+                      value: secondsLeft / current.restTime,
+                      strokeWidth: 3,
+                      backgroundColor: Colors.blue.shade50,
+                      valueColor: AlwaysStoppedAnimation(Colors.blue),
+                    ),
                   ),
+                ElevatedButton(
+                  onPressed: _toggleTimer,
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: EdgeInsets.all(10),
+                    elevation: 0,
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    fixedSize: const Size(92, 92),
+                  ),
+                  child: !workoutStarted
+                      ? Text("START")
+                      : isTimer
+                      ? Text(
+                          "$secondsLeft",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      : const Icon(Icons.check),
                 ),
-              ElevatedButton(
-                onPressed: _toggleTimer,
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: EdgeInsets.all(10),
-                  elevation: 0,
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  fixedSize: const Size(92, 92),
-                ),
-                child: !workoutStarted
-                    ? Text("START")
-                    : isTimer
-                    ? Text(
-                        "$secondsLeft",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    : const Icon(Icons.check),
-              ),
-            ],
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: currentIndex < widget.workout.exercises.length - 1
+                ? () => goToExercise(currentIndex + 1)
+                : null,
+            icon: Icon(
+              Icons.arrow_right,
+              size: 50,
+              color: Colors.grey.shade600,
+            ),
           ),
         ],
       ),
