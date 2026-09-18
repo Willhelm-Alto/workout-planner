@@ -14,7 +14,7 @@ class ExecutionPage extends StatefulWidget {
 
 class _ExecutionPageState extends State<ExecutionPage> {
   //TODO: Mostrar lista de exercícios já feitos
-  //TODO: Finalizar o treino 
+  //TODO: Finalizar o treino
   List<Exercise> doneExercisesList = [];
   Exercise get current => widget.workout.exercises[currentIndex];
 
@@ -49,10 +49,6 @@ class _ExecutionPageState extends State<ExecutionPage> {
   @override
   void initState() {
     super.initState();
-    // for (final e in widget.workout.exercises) {
-    //   doneExercisesList[e] = false;
-    // }
-    // current = doneExercisesList.entries.firstWhere((e) => !e.value).key;
     setWeightController();
     setNoteController();
   }
@@ -72,7 +68,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
   void setNoteController() => current.observation != null
       ? noteController.text = current.observation!
-      : noteController.text = "-";
+      : noteController.text = "";
 
   Future<bool> closeConfirmationDialog() async {
     final res = await showDialog(
@@ -131,10 +127,6 @@ class _ExecutionPageState extends State<ExecutionPage> {
     currentSet++;
     if (currentSet > current.set) {
       setState(() {
-        // doneExercisesList[current] = true;
-        // current = doneExercisesList.entries
-        //     .firstWhere((element) => !element.value)
-        //     .key;
         currentSet = 1;
         doneExercisesList.add(current);
         if (doneExercisesList.length < widget.workout.exercises.length) {
@@ -176,6 +168,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   Future<void> saveNote() async {
     FocusScope.of(context).unfocus();
     final newNote = noteController.text;
+    isEditingNote = false;
     if (newNote != current.observation) {
       setState(() => current.observation = newNote);
       await manager.editWorkout(widget.workout);
@@ -230,11 +223,16 @@ class _ExecutionPageState extends State<ExecutionPage> {
                             Text(
                               "Exercise ${currentIndex + 1} of ${widget.workout.exercises.length}",
                             ),
-                            LinearProgressIndicator(
-                              color: Colors.blue,
-                              value:
-                                  (currentIndex + 1) /
-                                  widget.workout.exercises.length,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(99),
+                              child: LinearProgressIndicator(
+                                minHeight: 6,
+                                backgroundColor: Colors.grey.shade200,
+                                color: Colors.blue,
+                                value:
+                                    doneExercisesList.length /
+                                    widget.workout.exercises.length,
+                              ),
                             ),
                           ],
                         ),
@@ -246,28 +244,26 @@ class _ExecutionPageState extends State<ExecutionPage> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
                           Chip(
                             backgroundColor: Colors.blue.shade50,
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
-                            labelStyle: TextStyle(),
                             label: Text('${current.repetitions} reps'),
                           ),
                           Chip(
                             backgroundColor: Colors.blue.shade50,
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
-                            labelStyle: TextStyle(),
                             label: Text('${current.set} sets'),
                           ),
                           Chip(
                             backgroundColor: Colors.blue.shade50,
                             side: BorderSide.none,
                             visualDensity: VisualDensity.compact,
-                            labelStyle: TextStyle(),
                             label: Text('${current.restTime}s rest'),
                           ),
                         ],
@@ -378,7 +374,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
   Widget buildCard({required Widget child}) {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade300),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 16),
         child: child,
@@ -388,22 +387,50 @@ class _ExecutionPageState extends State<ExecutionPage> {
 
   Widget _buildNoteField() {
     //TODO: Mudar campo quando não houver observação
+    final isNoteEmpty = noteController.text.isEmpty;
     return buildCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 6,
         children: [
-          Row(
-            spacing: 6,
-            children: [
-              Icon(Icons.list_alt, size: 16),
-              Expanded(child: Text("Note")),
-              IconButton(
-                onPressed: () => setState(() => isEditingNote = !isEditingNote),
-                icon: Icon(Icons.edit, size: 16),
+          if (!isNoteEmpty)
+            Row(
+              spacing: 6,
+              children: [
+                Icon(Icons.list_alt, size: 16),
+                Expanded(child: Text("Note")),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  constraints: const BoxConstraints(),
+                  padding: EdgeInsets.zero,
+                  onPressed: () =>
+                      setState(() => isEditingNote = !isEditingNote),
+                  icon: Icon(Icons.edit, size: 16),
+                ),
+              ],
+            ),
+          if (isNoteEmpty)
+            InkWell(
+              onTap: () => setState(() => isEditingNote = true),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  spacing: 6,
+                  children: [
+                    Icon(Icons.add, size: 16, color: Colors.blue),
+                    Text(
+                      "Add Note",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          if(!isNoteEmpty || isEditingNote)
           TextField(
             controller: noteController,
             readOnly: !isEditingNote,
@@ -472,9 +499,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
               alignment: Alignment.center,
               children: [
                 if (isTimer)
-                  SizedBox(
-                    width: 108,
-                    height: 108,
+                  SizedBox.expand(
                     child: CircularProgressIndicator(
                       value: secondsLeft / current.restTime,
                       strokeWidth: 3,
