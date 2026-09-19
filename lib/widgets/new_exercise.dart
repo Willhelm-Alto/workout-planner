@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:workout_planner/workout.dart';
+import 'package:workout_planner/workout_manager.dart';
 
 class NewExercise extends StatefulWidget {
   const NewExercise({
@@ -80,7 +80,7 @@ class _NewExerciseState extends State<NewExercise> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
                 label: Text(
-                  "Nome do Exercício",
+                  "Exercise Name",
                   style: TextStyle(
                     color: Colors.grey,
                     fontWeight: FontWeight.w500,
@@ -175,7 +175,7 @@ class _NewExerciseState extends State<NewExercise> {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Descanço'),
+                          label: Text('Rest'),
                           labelStyle: TextStyle(color: Colors.grey),
                           suffixText: "(s)",
                         ),
@@ -196,7 +196,7 @@ class _NewExerciseState extends State<NewExercise> {
                         ],
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Peso'),
+                          label: Text('Weight'),
                           labelStyle: TextStyle(color: Colors.grey),
                           suffixText: "(kg)",
                         ),
@@ -213,7 +213,7 @@ class _NewExerciseState extends State<NewExercise> {
                   child: TextFormField(
                     controller: observationController,
                     minLines: 3,
-                    maxLines: 3,
+                    maxLines: 5,
                     keyboardType: TextInputType.multiline,
                     onChanged: (value) => widget.exercise.observation = value,
                     decoration: InputDecoration(
@@ -235,7 +235,7 @@ class _NewExerciseState extends State<NewExercise> {
                   activeTrackColor: Colors.blue,
                 ),
                 Text(
-                  "Por Duração",
+                  "By duration",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
