@@ -15,8 +15,6 @@ class ExecutionPage extends StatefulWidget {
 }
 
 class _ExecutionPageState extends State<ExecutionPage> {
-  //TODO: Mostrar lista de exercises já feitos
-  //TODO: Finalizar o treino
   List<Exercise> doneExercisesList = [];
   Exercise get current => widget.workout.exercises[currentIndex];
 
@@ -166,9 +164,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
     if (newWeight != current.weight) {
       setState(() => current.weight = newWeight);
       await manager.editWorkout(widget.workout);
-      ScaffoldMessenger.of(context).showSnackBar(
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Weight Saved"), duration: Duration(seconds: 1)),
       );
+      }
     }
   }
 
@@ -179,9 +179,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
     if (newNote != current.observation) {
       setState(() => current.observation = newNote);
       await manager.editWorkout(widget.workout);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Note Saved"), duration: Duration(seconds: 1)),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Note Saved"), duration: Duration(seconds: 1)),
+        );
+      }
     }
   }
 
@@ -240,7 +242,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
         child: Column(
           spacing: 16,
           children: [
-            Spacer(flex: 2,),
+            Spacer(flex: 2),
             Container(
               width: 88,
               height: 88,
@@ -259,8 +261,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
             ),
             Text(widget.workout.title, style: TextStyle(fontSize: 15)),
-            Text("Total time: ${stopwatchStr}"),
-            Spacer(flex: 2,),
+            Text("Total time: $stopwatchStr"),
+            Spacer(flex: 2),
             SizedBox(
               width: double.infinity,
               height: 52,
