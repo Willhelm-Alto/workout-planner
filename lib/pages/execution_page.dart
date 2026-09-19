@@ -234,29 +234,54 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget finishedBody() {
-    //TODO: terminar essa tela
     return Center(
-      child: Column(
-        spacing: 12,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 88,
-            height: 88,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          spacing: 16,
+          children: [
+            Spacer(flex: 2,),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.check_rounded,
+                size: 48,
+                color: Colors.blue.shade700,
+              ),
             ),
-            child: Icon(Icons.check, color: Colors.white),
-          ),
-          Text("Workout Complete!"),
-          Text("Total time: ${stopwatchStr}"),
-          TextButton(
-            onPressed: () {}, 
-            child: Text("Done")
-          ),
-        ],
+            Text(
+              "Workout Complete!",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+            ),
+            Text(widget.workout.title, style: TextStyle(fontSize: 15)),
+            Text("Total time: ${stopwatchStr}"),
+            Spacer(flex: 2,),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Done",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
