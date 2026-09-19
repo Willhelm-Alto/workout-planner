@@ -75,7 +75,7 @@ class EmptyWorkout extends StatelessWidget {
               Icon(Icons.add_circle_outline, size: 40, color: Colors.grey),
               SizedBox(height: 12),
               Text(
-                "No workout found",
+                "No workouts found",
                 style: TextStyle(color: Colors.grey),
               ),
             ],

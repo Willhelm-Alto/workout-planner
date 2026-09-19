@@ -93,8 +93,14 @@ class HomePageState extends State<HomePage> {
             return Column(
               children: [
                 TableCalendar<Workout>(
+                  calendarStyle: CalendarStyle(),
                   calendarFormat: CalendarFormat.week,
-                  headerStyle: HeaderStyle(titleCentered: true),
+                  headerStyle: HeaderStyle(
+                    titleCentered: true,
+                    leftChevronVisible: false,
+                    rightChevronVisible: false,
+                    headerMargin: EdgeInsets.all(8)
+                  ),
                   availableCalendarFormats: const {
                     CalendarFormat.week: 'Semana',
                   },

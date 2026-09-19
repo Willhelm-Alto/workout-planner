@@ -30,11 +30,11 @@
 │                                          │
 ├──────────────────────────────────────────┤  borda superior grey.200
 │               ╭ ─ ─ ─ ─ ─ ╮              │  anel 108px = progresso
-│             ╱   ╭───────╮   ╲            │  do descanso, drenando
+│             ╱   ╭───────╮   ╲            │  do rest, drenando
 │            │    │  18   │    │           │  botão 92px azul sólido
 │             ╲   ╰───────╯   ╱            │
 │               ╰ ─ ─ ─ ─ ─ ╯              │
-│        Descanso · toque para pular       │  legenda cinza 13px
+│        rest · toque para pular       │  legenda cinza 13px
 └──────────────────────────────────────────┘
 
 

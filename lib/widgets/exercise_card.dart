@@ -70,7 +70,7 @@ class ExerciseCard extends StatelessWidget {
 String _summary(Exercise exercise) {
   return [
     exercise.byTime ? "${exercise.duration}s" : "${exercise.set} × ${exercise.repetitions}" ,
-    "${exercise.restTime}s descanso",
+    "${exercise.restTime}s rest",
     if (exercise.weight != null) "${exercise.weight} kg",
   ].join("  ·  ");
 }

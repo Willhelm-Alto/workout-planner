@@ -18,7 +18,7 @@ class EditWorkoutState extends State<EditWorkout> {
   final _workoutNameController = TextEditingController();
 
   List<Exercise> exercises = [];
-  DayOfWeek _selectedDayOfWeek = DayOfWeek.segunda;
+  DayOfWeek _selectedDayOfWeek = DayOfWeek.monday;
 
   bool isNew = false;
   bool showTimeField = false;

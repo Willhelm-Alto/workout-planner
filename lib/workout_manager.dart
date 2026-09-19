@@ -4,30 +4,30 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 enum DayOfWeek {
-  segunda,
-  terca,
-  quarta,
-  quinta,
-  sexta,
-  sabado,
-  domingo;
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday;
 
   String get label {
     switch (this) {
-      case segunda:
-        return "Segunda-feira";
-      case terca:
-        return "Terça-feira";
-      case quarta:
-        return "Quarta-quarta";
-      case quinta:
-        return "Quinta-feira";
-      case sexta:
-        return "Sexta-feira";
-      case sabado:
-        return "Sabádo";
-      case domingo:
-        return "Domingo";
+      case monday:
+        return "Monday";
+      case tuesday:
+        return "Tuesday";
+      case wednesday:
+        return "Wednesday";
+      case thursday:
+        return "Thursday";
+      case friday:
+        return "Friday";
+      case saturday:
+        return "Saturday";
+      case sunday:
+        return "Sunday";
     }
   }
 }
