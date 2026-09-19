@@ -80,7 +80,7 @@ class _NewExerciseState extends State<NewExercise> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
                 label: Text(
-                  "Nome do Exercício",
+                  "Exercise Name",
                   style: TextStyle(
                     color: Colors.grey,
                     fontWeight: FontWeight.w500,
@@ -175,7 +175,7 @@ class _NewExerciseState extends State<NewExercise> {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Descanço'),
+                          label: Text('Rest'),
                           labelStyle: TextStyle(color: Colors.grey),
                           suffixText: "(s)",
                         ),
@@ -196,7 +196,7 @@ class _NewExerciseState extends State<NewExercise> {
                         ],
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Peso'),
+                          label: Text('Weight'),
                           labelStyle: TextStyle(color: Colors.grey),
                           suffixText: "(kg)",
                         ),
@@ -235,7 +235,7 @@ class _NewExerciseState extends State<NewExercise> {
                   activeTrackColor: Colors.blue,
                 ),
                 Text(
-                  "Por Duração",
+                  "By duration",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

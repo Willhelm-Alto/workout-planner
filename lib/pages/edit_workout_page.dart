@@ -80,7 +80,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 controller: _workoutNameController,
                 style: TextStyle(fontWeight: FontWeight.w600),
                 decoration: InputDecoration(
-                  label: Text("Nome do Treino"),
+                  label: Text("Workout Name"),
                   labelStyle: TextStyle(
                     color: Colors.grey,
                     fontWeight: FontWeight.w600,
@@ -88,7 +88,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 ),
                 validator: (value) {
                   if (value == null || value == "") {
-                    return "Preencha o nome do treino";
+                    return "Fill the workout name";
                   }
                   return null;
                 },
@@ -108,7 +108,7 @@ class EditWorkoutState extends State<EditWorkout> {
                     .toList(),
                 initialValue: _selectedDayOfWeek,
                 decoration: InputDecoration(
-                  label: Text("Dia da Semana"),
+                  label: Text("Week day"),
                   labelStyle: TextStyle(color: Colors.grey),
                 ),
                 onChanged: (value) {
@@ -154,7 +154,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 }),
                 fieldValidator: (value) {
                   if (value == null || value == "") {
-                    return "Campo vazio";
+                    return "Empty field";
                   }
                   return null;
                 },
@@ -171,7 +171,7 @@ class EditWorkoutState extends State<EditWorkout> {
               if (_formKey.currentState!.validate()) {
                 if(exercises.isEmpty){
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Adicione exercícios nesse treino")),
+                    SnackBar(content: Text("Add exercises in this workout")),
                   );
                   return;
                 }
@@ -183,7 +183,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 );
                 if (!_manager.checkIfValid(workout)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Já existe um treino nesse dia")),
+                    SnackBar(content: Text("There is already a workout on this day")),
                   );
                   return;
                 }
@@ -205,7 +205,7 @@ class EditWorkoutState extends State<EditWorkout> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "SALVAR",
+                  "Save",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,

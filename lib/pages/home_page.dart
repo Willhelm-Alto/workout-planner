@@ -27,7 +27,10 @@ class HomePageState extends State<HomePage> {
           children: [
             Icon(Icons.event_busy, size: 40, color: Colors.grey),
             SizedBox(height: 12),
-            Text("Nenhum treino neste dia", style: TextStyle(color: Colors.grey)),
+            Text(
+              "No workout for this day",
+              style: TextStyle(color: Colors.grey),
+            ),
           ],
         ),
       );
@@ -49,26 +52,19 @@ class HomePageState extends State<HomePage> {
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
               ),
               Text(
-                "$count ${count == 1 ? 'exercício' : 'exercícios'}",
+                "$count ${count == 1 ? 'exercise' : 'exercises'}",
                 style: TextStyle(color: Colors.grey),
               ),
             ],
           ),
         ),
         Expanded(
-          child: count == 0
-              ? const Center(
-                  child: Text(
-                    "Nenhum exercício neste treino",
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  itemCount: count,
-                  itemBuilder: (_, i) =>
-                      ExerciseCard(exercise: workout.exercises[i], index: i),
-                ),
+          child: ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            itemCount: count,
+            itemBuilder: (_, i) =>
+                ExerciseCard(exercise: workout.exercises[i], index: i),
+          ),
         ),
       ],
     );
@@ -87,7 +83,7 @@ class HomePageState extends State<HomePage> {
     return FutureBuilder(
       future: _loadFuture,
       builder: (context, snapshot) {
-        if(snapshot.connectionState != ConnectionState.done){
+        if (snapshot.connectionState != ConnectionState.done) {
           return Center(child: CircularProgressIndicator());
         }
         return ListenableBuilder(
@@ -99,7 +95,9 @@ class HomePageState extends State<HomePage> {
                 TableCalendar<Workout>(
                   calendarFormat: CalendarFormat.week,
                   headerStyle: HeaderStyle(titleCentered: true),
-                  availableCalendarFormats: const {CalendarFormat.week: 'Semana'},
+                  availableCalendarFormats: const {
+                    CalendarFormat.week: 'Semana',
+                  },
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   focusedDay: _today,
                   firstDay: getFirstDayOfWeek(_today),
@@ -133,44 +131,46 @@ class HomePageState extends State<HomePage> {
                 SizedBox(
                   width: double.infinity,
                   height: 56,
-                  child: workout == null ? null :  TextButton(
-                    onPressed: () => Navigator.push(
+                  child: workout == null
+                      ? null
+                      : TextButton(
+                          onPressed: () => Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => ExecutionPage(workout: workout),
                             ),
                           ),
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey[300],
-                      disabledForegroundColor: Colors.grey[600],
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "START",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.2,
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.grey[300],
+                            disabledForegroundColor: Colors.grey[600],
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "START",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_ios, size: 16),
+                            ],
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward_ios, size: 16),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             );
-          }
+          },
         );
-      }
+      },
     );
   }
 }

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:workout_planner/widgets/execution_page_card.dart';
-import 'package:workout_planner/widgets/execution_page_chip.dart';
+import 'package:workout_planner/widgets/execution_card.dart';
+import 'package:workout_planner/widgets/execution_chip.dart';
 import 'package:workout_planner/workout_manager.dart';
 
 class ExecutionPage extends StatefulWidget {
@@ -15,7 +15,7 @@ class ExecutionPage extends StatefulWidget {
 }
 
 class _ExecutionPageState extends State<ExecutionPage> {
-  //TODO: Mostrar lista de exercícios já feitos
+  //TODO: Mostrar lista de exercises já feitos
   //TODO: Finalizar o treino
   List<Exercise> doneExercisesList = [];
   Exercise get current => widget.workout.exercises[currentIndex];

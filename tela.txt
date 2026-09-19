@@ -3,7 +3,7 @@
 │  ←   Treino A               ⧗ 00:12:34   │  AppBar azul (tema)
 ├──────────────────────────────────────────┤
 │                                          │
-│  Exercício 2 de 5         1 concluídos   │  cinza 13px
+│  exercise 2 de 5         1 concluídos   │  cinza 13px
 │  ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  │  barra 6px, raio total
 │                                          │
 │  SUPINO RETO                             │  26px w700

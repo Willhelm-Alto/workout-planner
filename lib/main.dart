@@ -73,7 +73,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         items: [
           BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
           BottomNavigationBarItem(
-            label: "Treino",
+            label: "Workout",
             icon: Icon(Icons.fitness_center),
           ),
         ],

@@ -52,7 +52,7 @@ class WorkoutCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "${workout.exercises.length} exercícios",
+                    "${workout.exercises.length} exercises",
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
