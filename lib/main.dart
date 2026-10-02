@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:workout_planner/pages/edit_workout_page.dart';
 import 'package:workout_planner/pages/home_page.dart';
 import 'package:workout_planner/pages/workouts_page.dart';
+import 'package:workout_planner/theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('pt_BR', null);
+  await ThemeController().load();
   runApp(const MyApp());
 }
 
@@ -12,30 +18,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue[600],
-          foregroundColor: Colors.white,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.red),
-          ),
-          hintStyle: TextStyle(color: Colors.grey),
-        ),
+    final themeController = ThemeController();
+    return ListenableBuilder(
+      listenable: themeController,
+      builder: (context, child) => MaterialApp(
+        title: 'Planejador de Treinos',
+        locale: const Locale('pt', 'BR'),
+        supportedLocales: const [Locale('pt', 'BR')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: themeController.themeMode,
+        home: child,
       ),
-      title: 'Workout Tracker',
-      home: const Home(),
+      child: const Home(),
     );
   }
 }
@@ -53,30 +53,38 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: ThemeController().toggle,
+            icon: Icon(
+              ThemeController().isDark ? Icons.light_mode : Icons.dark_mode,
+            ),
+          ),
+        ],
         centerTitle: true,
       ),
       body: _pages.elementAt(_pageIndex),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.blue,
         onTap: (value) => setState(() => _pageIndex = value),
         currentIndex: _pageIndex,
         items: [
-          BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
+          BottomNavigationBarItem(label: "Início", icon: Icon(Icons.home)),
           BottomNavigationBarItem(
-            label: "Workout",
+            label: "Treinos",
             icon: Icon(Icons.fitness_center),
           ),
         ],
       ),
       floatingActionButton: _pageIndex == 1 ? IconButton(
-          style: IconButton.styleFrom(side: BorderSide(color: Colors.blue)),
+          style: IconButton.styleFrom(side: BorderSide(color: scheme.primary)),
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditWorkout()),
           ),
-          icon: Icon(Icons.add, color: Colors.blue),
+          icon: Icon(Icons.add, color: scheme.primary),
         ) : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );

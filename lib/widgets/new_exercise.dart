@@ -49,13 +49,9 @@ class _NewExerciseState extends State<NewExercise> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
@@ -65,7 +61,7 @@ class _NewExerciseState extends State<NewExercise> {
                 Expanded(
                   child: ReorderableDragStartListener(
                     index: widget.index,
-                    child: Icon(Icons.drag_handle, color: Colors.grey),
+                    child: Icon(Icons.drag_handle, color: scheme.onSurfaceVariant),
                   ),
                 ),
               ],
@@ -79,11 +75,8 @@ class _NewExerciseState extends State<NewExercise> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 8),
                 label: Text(
-                  "Exercise Name",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  "Nome do exercício",
+                  style: TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),
             ),
@@ -111,7 +104,6 @@ class _NewExerciseState extends State<NewExercise> {
                                   horizontal: 8,
                                 ),
                                 label: Text('Duração'),
-                                labelStyle: TextStyle(color: Colors.grey),
                                 suffixText: "(s)",
                               ),
                             ),
@@ -133,7 +125,6 @@ class _NewExerciseState extends State<NewExercise> {
                                   horizontal: 8,
                                 ),
                                 label: Text('Set'),
-                                labelStyle: TextStyle(color: Colors.grey),
                               ),
                             ),
                           ),
@@ -153,7 +144,6 @@ class _NewExerciseState extends State<NewExercise> {
                           disabledBorder: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
                           label: Text('Rep'),
-                          labelStyle: TextStyle(color: Colors.grey),
                         ),
                       ),
                     ),
@@ -176,8 +166,7 @@ class _NewExerciseState extends State<NewExercise> {
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Rest'),
-                          labelStyle: TextStyle(color: Colors.grey),
+                          label: Text('Descanso'),
                           suffixText: "(s)",
                         ),
                       ),
@@ -197,8 +186,7 @@ class _NewExerciseState extends State<NewExercise> {
                         ],
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                          label: Text('Weight'),
-                          labelStyle: TextStyle(color: Colors.grey),
+                          label: Text('Carga'),
                           suffixText: "(kg)",
                         ),
                       ),
@@ -220,7 +208,6 @@ class _NewExerciseState extends State<NewExercise> {
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.all(10),
                       label: Text('Obs.'),
-                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                   ),
                 ),
@@ -233,21 +220,20 @@ class _NewExerciseState extends State<NewExercise> {
                   value: widget.exercise.byTime,
                   onChanged: (value) =>
                       setState(() => widget.exercise.byTime = value),
-                  activeTrackColor: Colors.blue,
                 ),
                 Text(
-                  "By duration",
+                  "Por duração",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: widget.exercise.byTime
-                        ? Colors.blue.shade700
-                        : Colors.grey,
+                        ? scheme.onSecondaryContainer
+                        : scheme.onSurfaceVariant,
                   ),
                 ),
                 Spacer(),
                 IconButton(
-                  color: Colors.red,
+                  color: scheme.error,
                   onPressed: () => widget.onDelete(),
                   icon: Icon(Icons.delete, size: 20),
                 ),

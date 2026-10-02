@@ -8,14 +8,9 @@ class WorkoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
-      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
-      ),
       child: InkWell(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
@@ -44,16 +39,14 @@ class WorkoutCard extends StatelessWidget {
                     label: Text(workout.day.label),
                     labelStyle: TextStyle(fontSize: 12),
                     visualDensity: VisualDensity.compact,
-                    side: BorderSide.none,
-                    backgroundColor: Colors.blue.shade50,
                   ),
                 ],
               ),
               Row(
                 children: [
                   Text(
-                    "${workout.exercises.length} exercises",
-                    style: TextStyle(color: Colors.grey),
+                    "${workout.exercises.length} ${workout.exercises.length == 1 ? 'exercício' : 'exercícios'}",
+                    style: TextStyle(color: scheme.onSurfaceVariant),
                   ),
                 ],
               ),

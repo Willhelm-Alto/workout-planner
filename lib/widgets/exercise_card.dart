@@ -10,13 +10,16 @@ class ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: customBorder != null ? customBorder! : BorderSide(color: Colors.grey.shade300),
-      ),
+      // null falls through to cardTheme; only an explicit override builds a shape
+      shape: customBorder == null
+          ? null
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: customBorder!,
+            ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -27,7 +30,7 @@ class ExerciseCard extends StatelessWidget {
               height: 28,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: scheme.secondaryContainer,
                 shape: BoxShape.circle,
               ),
               child: Text(
@@ -35,7 +38,7 @@ class ExerciseCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Colors.blue.shade700,
+                  color: scheme.onSecondaryContainer,
                 ),
               ),
             ),
@@ -54,7 +57,7 @@ class ExerciseCard extends StatelessWidget {
                     _summary(exercise),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
                   ),
                 ],
               ),
@@ -70,7 +73,7 @@ class ExerciseCard extends StatelessWidget {
 String _summary(Exercise exercise) {
   return [
     exercise.byTime ? "${exercise.duration}s" : "${exercise.set} × ${exercise.repetitions}" ,
-    "${exercise.restTime}s rest",
+    "${exercise.restTime}s descanso",
     if (exercise.weight != null) "${exercise.weight} kg",
   ].join("  ·  ");
 }

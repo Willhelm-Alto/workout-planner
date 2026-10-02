@@ -15,19 +15,19 @@ enum DayOfWeek {
   String get label {
     switch (this) {
       case monday:
-        return "Monday";
+        return "Segunda-feira";
       case tuesday:
-        return "Tuesday";
+        return "Terça-feira";
       case wednesday:
-        return "Wednesday";
+        return "Quarta-feira";
       case thursday:
-        return "Thursday";
+        return "Quinta-feira";
       case friday:
-        return "Friday";
+        return "Sexta-feira";
       case saturday:
-        return "Saturday";
+        return "Sábado";
       case sunday:
-        return "Sunday";
+        return "Domingo";
     }
   }
 }

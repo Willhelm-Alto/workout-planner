@@ -42,8 +42,9 @@ class EditWorkoutState extends State<EditWorkout> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(isNew ? "New Workout" : "Edit Workout")),
+      appBar: AppBar(title: Text(isNew ? "Novo Treino" : "Editar Treino")),
       body: Form(
         key: _formKey,
         child: ReorderableListView(
@@ -80,15 +81,15 @@ class EditWorkoutState extends State<EditWorkout> {
                 controller: _workoutNameController,
                 style: TextStyle(fontWeight: FontWeight.w600),
                 decoration: InputDecoration(
-                  label: Text("Workout Name"),
+                  label: Text("Nome do treino"),
                   labelStyle: TextStyle(
-                    color: Colors.grey,
+                    color: scheme.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value == "") {
-                    return "Fill the workout name";
+                    return "Preencha o nome do treino";
                   }
                   return null;
                 },
@@ -108,8 +109,7 @@ class EditWorkoutState extends State<EditWorkout> {
                     .toList(),
                 initialValue: _selectedDayOfWeek,
                 decoration: InputDecoration(
-                  label: Text("Week day"),
-                  labelStyle: TextStyle(color: Colors.grey),
+                  label: Text("Dia da semana"),
                 ),
                 onChanged: (value) {
                   _selectedDayOfWeek = value!;
@@ -125,7 +125,7 @@ class EditWorkoutState extends State<EditWorkout> {
                         child: Divider(),
                       ),
                     ),
-                    Text("Exercises", style: TextStyle(color: Colors.grey)),
+                    Text("Exercícios", style: TextStyle(color: scheme.onSurfaceVariant)),
                     Expanded(
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 10),
@@ -138,10 +138,10 @@ class EditWorkoutState extends State<EditWorkout> {
             ],
           ),
           footer:IconButton(
-              style: IconButton.styleFrom(side: BorderSide(color: Colors.grey)),
+              style: IconButton.styleFrom(side: BorderSide(color: scheme.outline)),
               onPressed: () =>
                   setState(() => exercises.add(Exercise(title: ""))),
-              icon: Icon(Icons.add, color: Colors.grey),
+              icon: Icon(Icons.add, color: scheme.onSurfaceVariant),
             ),
           children: [
             for(final (i, e) in exercises.indexed)
@@ -154,7 +154,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 }),
                 fieldValidator: (value) {
                   if (value == null || value == "") {
-                    return "Empty field";
+                    return "Campo vazio";
                   }
                   return null;
                 },
@@ -171,7 +171,7 @@ class EditWorkoutState extends State<EditWorkout> {
               if (_formKey.currentState!.validate()) {
                 if(exercises.isEmpty){
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Add exercises in this workout")),
+                    SnackBar(content: Text("Adicione exercícios a este treino")),
                   );
                   return;
                 }
@@ -183,7 +183,7 @@ class EditWorkoutState extends State<EditWorkout> {
                 );
                 if (!_manager.checkIfValid(workout)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("There is already a workout on this day")),
+                    SnackBar(content: Text("Já existe um treino neste dia")),
                   );
                   return;
                 }
@@ -197,15 +197,15 @@ class EditWorkoutState extends State<EditWorkout> {
               }
             },
             style: TextButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
+              backgroundColor: scheme.primary,
+              foregroundColor: scheme.onPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Save",
+                  "Salvar",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,

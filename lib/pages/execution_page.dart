@@ -45,10 +45,6 @@ class _ExecutionPageState extends State<ExecutionPage> {
     return "$h:$m:$s";
   }
 
-  String get seriesStr {
-    return "series: ${current.set}   .   rest: ${current.restTime}s";
-  }
-
   @override
   void initState() {
     super.initState();
@@ -191,7 +187,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Weight Saved"),
+            content: Text("Carga salva"),
             duration: Duration(seconds: 1),
           ),
         );
@@ -208,7 +204,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
       await manager.editWorkout(widget.workout);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Note Saved"), duration: Duration(seconds: 1)),
+          SnackBar(content: Text("Observação salva"), duration: Duration(seconds: 1)),
         );
       }
     }
@@ -263,6 +259,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget finishedBody() {
+    final scheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -274,21 +271,21 @@ class _ExecutionPageState extends State<ExecutionPage> {
               width: 88,
               height: 88,
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: scheme.secondaryContainer,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.check_rounded,
                 size: 48,
-                color: Colors.blue.shade700,
+                color: scheme.onSecondaryContainer,
               ),
             ),
             Text(
-              "Workout Complete!",
+              "Treino concluído!",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
             ),
             Text(widget.workout.title, style: TextStyle(fontSize: 15)),
-            Text("Total time: $stopwatchStr"),
+            Text("Tempo total: $stopwatchStr"),
             Spacer(flex: 2),
             SizedBox(
               width: double.infinity,
@@ -297,14 +294,14 @@ class _ExecutionPageState extends State<ExecutionPage> {
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+                  backgroundColor: scheme.primary,
+                  foregroundColor: scheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: const Text(
-                  "Done",
+                  "Concluir",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -316,6 +313,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget executionBody() {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         Expanded(
@@ -331,14 +329,12 @@ class _ExecutionPageState extends State<ExecutionPage> {
                     spacing: 6,
                     children: [
                       Text(
-                        "Exercise ${currentIndex + 1} of ${widget.workout.exercises.length}",
+                        "Exercício ${currentIndex + 1} de ${widget.workout.exercises.length}",
                       ),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(99),
                         child: LinearProgressIndicator(
                           minHeight: 6,
-                          backgroundColor: Colors.grey.shade200,
-                          color: Colors.blue,
                           value:
                               doneExercisesList.length /
                               widget.workout.exercises.length,
@@ -359,14 +355,14 @@ class _ExecutionPageState extends State<ExecutionPage> {
                         ? ExecutionChip(text: '${current.repetitions} reps')
                         : ExecutionChip(text: '${current.duration}s'),
                     ExecutionChip(text: '${current.set} sets'),
-                    ExecutionChip(text: '${current.restTime}s rest'),
+                    ExecutionChip(text: '${current.restTime}s descanso'),
                   ],
                 ),
                 ExecutionCard(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Set $currentSet of ${current.set}"),
+                      Text("Set $currentSet de ${current.set}"),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         spacing: 6,
@@ -378,12 +374,12 @@ class _ExecutionPageState extends State<ExecutionPage> {
                             height: 12,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: done ? Colors.blue : Colors.transparent,
+                              color: done ? scheme.primary : Colors.transparent,
                               border: Border.all(
                                 width: 2,
                                 color: done || active
-                                    ? Colors.blue
-                                    : Colors.grey.shade500,
+                                    ? scheme.primary
+                                    : scheme.outline,
                               ),
                             ),
                           );
@@ -400,7 +396,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
                         spacing: 6,
                         children: [
                           Icon(Icons.fitness_center, size: 16),
-                          Text("Weight"),
+                          Text("Carga"),
                         ],
                       ),
                       Row(
@@ -428,7 +424,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
                           TextButton(
                             onPressed: () => saveWeight(),
                             style: TextButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: scheme.primary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.all(
                                   Radius.circular(8),
@@ -437,8 +433,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
-                              "Save",
-                              style: TextStyle(color: Colors.white),
+                              "Salvar",
+                              style: TextStyle(color: scheme.onPrimary),
                             ),
                           ),
                         ],
@@ -457,6 +453,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget _buildNoteField() {
+    final scheme = Theme.of(context).colorScheme;
     final isNoteEmpty = noteController.text.isEmpty;
     return ExecutionCard(
       child: Column(
@@ -468,7 +465,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
               spacing: 6,
               children: [
                 Icon(Icons.list_alt, size: 16),
-                Expanded(child: Text("Note")),
+                Expanded(child: Text("Observação")),
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   constraints: const BoxConstraints(),
@@ -488,11 +485,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
                 child: Row(
                   spacing: 6,
                   children: [
-                    Icon(Icons.add, size: 16, color: Colors.blue),
+                    Icon(Icons.add, size: 16, color: scheme.primary),
                     Text(
-                      "Add Note",
+                      "Adicionar observação",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: scheme.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -525,18 +522,18 @@ class _ExecutionPageState extends State<ExecutionPage> {
                     setNoteController();
                     isEditingNote = false;
                   }),
-                  child: Text("Cancel", style: TextStyle(color: Colors.blue)),
+                  child: Text("Cancelar", style: TextStyle(color: scheme.primary)),
                 ),
                 TextButton(
                   onPressed: () => saveNote(),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: scheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: Text("Save", style: TextStyle(color: Colors.white)),
+                  child: Text("Salvar", style: TextStyle(color: scheme.onPrimary)),
                 ),
               ],
             ),
@@ -546,10 +543,11 @@ class _ExecutionPageState extends State<ExecutionPage> {
   }
 
   Widget _buildMainButton() {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         border: BoxBorder.fromLTRB(
-          top: BorderSide(color: Colors.grey.shade300),
+          top: BorderSide(color: scheme.outlineVariant),
         ),
       ),
       padding: EdgeInsets.all(10),
@@ -560,7 +558,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
             onPressed: currentIndex > 0
                 ? () => goToExercise(currentIndex - 1)
                 : null,
-            icon: Icon(Icons.arrow_left, size: 50, color: Colors.grey.shade600),
+            icon: const Icon(Icons.arrow_left, size: 50),
           ),
           SizedBox(
             width: 108,
@@ -577,11 +575,10 @@ class _ExecutionPageState extends State<ExecutionPage> {
                               ? (current.duration ?? 30)
                               : current.restTime),
                       strokeWidth: 3,
-                      backgroundColor: Colors.blue.shade50,
                       valueColor: AlwaysStoppedAnimation(
                         phase == Phase.exercising
-                            ? Colors.orange
-                            : Colors.blue,
+                            ? scheme.tertiary
+                            : scheme.primary,
                       ),
                     ),
                   ),
@@ -591,12 +588,18 @@ class _ExecutionPageState extends State<ExecutionPage> {
                     shape: const CircleBorder(),
                     padding: EdgeInsets.all(10),
                     elevation: 0,
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+                    backgroundColor: scheme.primary,
+                    foregroundColor: scheme.onPrimary,
                     fixedSize: const Size(92, 92),
                   ),
                   child: !workoutStarted
-                      ? Text("START")
+                      ? Text(
+                          "INICIAR",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
                       : phase != Phase.idle
                       ? Text(
                           "$secondsLeft",
@@ -616,11 +619,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
             onPressed: currentIndex < widget.workout.exercises.length - 1
                 ? () => goToExercise(currentIndex + 1)
                 : null,
-            icon: Icon(
-              Icons.arrow_right,
-              size: 50,
-              color: Colors.grey.shade600,
-            ),
+            icon: const Icon(Icons.arrow_right, size: 50),
           ),
         ],
       ),

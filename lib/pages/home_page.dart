@@ -19,17 +19,18 @@ class HomePageState extends State<HomePage> {
   late final Future<void> _loadFuture = manager.load();
 
   Widget _buildWorkoutOfDay(DateTime day) {
+    final scheme = Theme.of(context).colorScheme;
     final workout = _workoutForDay(day);
     if (workout == null) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.event_busy, size: 40, color: Colors.grey),
+            Icon(Icons.event_busy, size: 40, color: scheme.onSurfaceVariant),
             SizedBox(height: 12),
             Text(
-              "No workout for this day",
-              style: TextStyle(color: Colors.grey),
+              "Nenhum treino neste dia",
+              style: TextStyle(color: scheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -52,8 +53,8 @@ class HomePageState extends State<HomePage> {
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
               ),
               Text(
-                "$count ${count == 1 ? 'exercise' : 'exercises'}",
-                style: TextStyle(color: Colors.grey),
+                "$count ${count == 1 ? 'exercício' : 'exercícios'}",
+                style: TextStyle(color: scheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -89,17 +90,68 @@ class HomePageState extends State<HomePage> {
         return ListenableBuilder(
           listenable: manager,
           builder: (context, child) {
+            final theme = Theme.of(context);
+            final scheme = theme.colorScheme;
+            final dayStyle = theme.textTheme.bodyMedium ?? const TextStyle();
+            final dowStyle = theme.textTheme.labelMedium ?? const TextStyle();
             final workout = _workoutForDay(_selectedDay);
             return Column(
               children: [
                 TableCalendar<Workout>(
-                  calendarStyle: CalendarStyle(),
                   calendarFormat: CalendarFormat.week,
+                  locale: 'pt_BR',
+                  // table_calendar's defaults hardcode their own light colors
+                  // and never read ThemeData, so every style is passed here.
+                  calendarStyle: CalendarStyle(
+                    defaultTextStyle: dayStyle.copyWith(color: scheme.onSurface),
+                    weekendTextStyle: dayStyle.copyWith(color: scheme.onSurface),
+                    holidayTextStyle: dayStyle.copyWith(color: scheme.primary),
+                    outsideTextStyle:
+                        dayStyle.copyWith(color: scheme.onSurfaceVariant),
+                    disabledTextStyle: dayStyle.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.38),
+                    ),
+                    weekNumberTextStyle: dayStyle.copyWith(
+                      fontSize: 12,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    todayTextStyle: dayStyle.copyWith(
+                      color: scheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    todayDecoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: scheme.primary, width: 1.5),
+                    ),
+                    selectedTextStyle: dayStyle.copyWith(
+                      color: scheme.onPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    selectedDecoration: BoxDecoration(
+                      color: scheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    rangeHighlightColor: scheme.secondaryContainer,
+                    markerDecoration: BoxDecoration(
+                      color: scheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  daysOfWeekStyle: DaysOfWeekStyle(
+                    weekdayStyle:
+                        dowStyle.copyWith(color: scheme.onSurfaceVariant),
+                    weekendStyle:
+                        dowStyle.copyWith(color: scheme.onSurfaceVariant),
+                  ),
                   headerStyle: HeaderStyle(
                     titleCentered: true,
                     leftChevronVisible: false,
                     rightChevronVisible: false,
-                    headerMargin: EdgeInsets.all(8)
+                    headerMargin: EdgeInsets.all(8),
+                    titleTextStyle: (theme.textTheme.titleMedium ??
+                            const TextStyle())
+                        .copyWith(color: scheme.onSurface, fontSize: 17),
+                    decoration: BoxDecoration(color: scheme.surface),
                   ),
                   availableCalendarFormats: const {
                     CalendarFormat.week: 'Semana',
@@ -119,11 +171,19 @@ class HomePageState extends State<HomePage> {
                     markerBuilder: (context, day, _) {
                       final workout = _workoutForDay(day);
                       if (workout == null) return null;
+                      // The marker is stacked over the day cell, so on the
+                      // selected day it lands on top of the primary fill.
+                      final onFill = isSameDay(_selectedDay, day);
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
                           workout.title,
-                          style: const TextStyle(fontSize: 9),
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: onFill
+                                ? scheme.onPrimary
+                                : scheme.onSurfaceVariant,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
@@ -147,10 +207,8 @@ class HomePageState extends State<HomePage> {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: Colors.grey[300],
-                            disabledForegroundColor: Colors.grey[600],
+                            backgroundColor: scheme.primary,
+                            foregroundColor: scheme.onPrimary,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.zero,
                             ),
@@ -159,7 +217,7 @@ class HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "START",
+                                "INICIAR",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

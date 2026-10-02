@@ -14,6 +14,7 @@ class WorkoutPage extends StatelessWidget {
       listenable: manager,
       builder: (context, child) {
         if(manager.workouts.isEmpty) return EmptyWorkout();
+        final scheme = Theme.of(context).colorScheme;
         return Column(
           children: [
             Expanded(
@@ -26,12 +27,12 @@ class WorkoutPage extends StatelessWidget {
                         direction: DismissDirection.startToEnd,
                         background: Container(
                           decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: scheme.error,
                             borderRadius: BorderRadius.circular(12)
                           ),
                           alignment: Alignment.centerLeft,
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Icon(Icons.delete, color: Colors.white),
+                          child: Icon(Icons.delete, color: scheme.onError),
                         ),
                         key: ValueKey(e.id),
                         onDismissed: (_) async{
@@ -56,6 +57,7 @@ class EmptyWorkout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Center(
       child: InkWell(
         onTap: () => Navigator.push(
@@ -66,17 +68,17 @@ class EmptyWorkout extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border.all(color: scheme.outline),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Column(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add_circle_outline, size: 40, color: Colors.grey),
-              SizedBox(height: 12),
+              Icon(Icons.add_circle_outline, size: 40, color: scheme.onSurfaceVariant),
+              const SizedBox(height: 12),
               Text(
-                "No workouts found",
-                style: TextStyle(color: Colors.grey),
+                "Nenhum treino salvo",
+                style: TextStyle(color: scheme.onSurfaceVariant),
               ),
             ],
           ),
