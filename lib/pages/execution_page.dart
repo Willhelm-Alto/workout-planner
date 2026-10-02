@@ -6,6 +6,8 @@ import 'package:workout_planner/widgets/execution_card.dart';
 import 'package:workout_planner/widgets/execution_chip.dart';
 import 'package:workout_planner/workout_manager.dart';
 
+enum Phase { idle, exercising, resting }
+
 class ExecutionPage extends StatefulWidget {
   const ExecutionPage({required this.workout, super.key});
   final Workout workout;
@@ -21,7 +23,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
   Timer? ticker;
   Timer? timer;
 
-  bool isTimer = false;
+  Phase phase = Phase.idle;
   bool workoutStarted = false;
   bool isEditingNote = false;
   bool isWorkoutDone = false;
@@ -92,54 +94,75 @@ class _ExecutionPageState extends State<ExecutionPage> {
     return res ?? false;
   }
 
-  void _toggleTimer() {
-    if (!workoutStarted) {
-      workoutStarted = true;
-      setState(() {});
-      stopwatch.start();
-      ticker ??= Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
-      return;
-    }
-
-    if (isTimer) {
-      timer?.cancel();
-      setState(() => finishTimer());
-      return;
-    }
-
+  void startCountdown(Phase next, int seconds, VoidCallback onDone) {
+    timer?.cancel();
     setState(() {
-      isTimer = true;
-      secondsLeft = current.restTime;
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      phase = next;
+      secondsLeft = seconds;
+      timer = Timer.periodic(const Duration(seconds: 1), (t) {
         setState(() {
           secondsLeft--;
-          if (secondsLeft == 0) {
-            timer.cancel();
-            finishTimer();
+          if (secondsLeft <= 0) {
+            t.cancel();
+            onDone();
           }
         });
       });
     });
   }
 
-  void finishTimer() {
+  void finishSet() {
     timer = null;
-    isTimer = false;
+    phase = Phase.idle;
+    secondsLeft = 0;
     currentSet++;
     if (currentSet > current.set) {
-      setState(() {
-        currentSet = 1;
+      currentSet = 1;
+      if (!doneExercisesList.contains(current)) {
         doneExercisesList.add(current);
-        if (doneExercisesList.length < widget.workout.exercises.length) {
-          currentIndex++;
-          setWeightController();
-          setNoteController();
+      }
+      if (doneExercisesList.length < widget.workout.exercises.length) {
+        currentIndex++;
+        setWeightController();
+        setNoteController();
+      } else {
+        ticker?.cancel();
+        stopwatch.stop();
+        isWorkoutDone = true;
+      }
+    }
+  }
+
+  void startRest() {
+    if (current.restTime <= 0) {
+      setState(finishSet);
+      return;
+    }
+    startCountdown(Phase.resting, current.restTime, finishSet);
+  }
+
+  void _toggleTimer() {
+    if (!workoutStarted) {
+      workoutStarted = true;
+      stopwatch.start();
+      ticker ??= Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+      setState(() {});
+      return;
+    }
+
+    switch(phase){
+      case Phase.idle:
+        if(current.byTime){
+          startCountdown(Phase.exercising, current.duration ?? 30, startRest);
         } else {
-          ticker?.cancel();
-          stopwatch.stop();
-          isWorkoutDone = true;
+          startRest();
         }
-      });
+      case Phase.exercising:
+        timer?.cancel();
+        startRest();
+      case Phase.resting:
+        timer?.cancel();
+        setState(finishSet);
     }
   }
 
@@ -148,7 +171,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
     timer?.cancel();
     setState(() {
       timer = null;
-      isTimer = false;
+      phase = Phase.idle;
+      secondsLeft = 0;
       currentIndex = index;
       currentSet = 1;
       isEditingNote = false;
@@ -164,10 +188,13 @@ class _ExecutionPageState extends State<ExecutionPage> {
     if (newWeight != current.weight) {
       setState(() => current.weight = newWeight);
       await manager.editWorkout(widget.workout);
-      if(mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Weight Saved"), duration: Duration(seconds: 1)),
-      );
+          SnackBar(
+            content: Text("Weight Saved"),
+            duration: Duration(seconds: 1),
+          ),
+        );
       }
     }
   }
@@ -328,7 +355,9 @@ class _ExecutionPageState extends State<ExecutionPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    ExecutionChip(text: '${current.repetitions} reps'),
+                    !current.byTime
+                        ? ExecutionChip(text: '${current.repetitions} reps')
+                        : ExecutionChip(text: '${current.duration}s'),
                     ExecutionChip(text: '${current.set} sets'),
                     ExecutionChip(text: '${current.restTime}s rest'),
                   ],
@@ -539,13 +568,21 @@ class _ExecutionPageState extends State<ExecutionPage> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                if (isTimer)
+                if (phase != Phase.idle)
                   SizedBox.expand(
                     child: CircularProgressIndicator(
-                      value: secondsLeft / current.restTime,
+                      value:
+                          secondsLeft /
+                          (phase == Phase.exercising
+                              ? (current.duration ?? 30)
+                              : current.restTime),
                       strokeWidth: 3,
                       backgroundColor: Colors.blue.shade50,
-                      valueColor: AlwaysStoppedAnimation(Colors.blue),
+                      valueColor: AlwaysStoppedAnimation(
+                        phase == Phase.exercising
+                            ? Colors.orange
+                            : Colors.blue,
+                      ),
                     ),
                   ),
                 ElevatedButton(
@@ -560,7 +597,7 @@ class _ExecutionPageState extends State<ExecutionPage> {
                   ),
                   child: !workoutStarted
                       ? Text("START")
-                      : isTimer
+                      : phase != Phase.idle
                       ? Text(
                           "$secondsLeft",
                           style: const TextStyle(
@@ -568,6 +605,8 @@ class _ExecutionPageState extends State<ExecutionPage> {
                             fontWeight: FontWeight.w700,
                           ),
                         )
+                      : current.byTime
+                      ? const Icon(Icons.play_arrow_rounded)
                       : const Icon(Icons.check),
                 ),
               ],

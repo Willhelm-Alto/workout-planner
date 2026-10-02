@@ -28,9 +28,8 @@ class _NewExerciseState extends State<NewExercise> {
   void initState() {
     super.initState();
     setController.text = widget.exercise.set.toString();
-    widget.exercise.duration != null
-        ? durationController.text = widget.exercise.duration.toString()
-        : durationController.text = "10";
+    widget.exercise.duration ??= 10;
+    durationController.text = widget.exercise.duration.toString();
     widget.exercise.weight != null
         ? weightController.text = widget.exercise.weight.toString()
         : weightController.text = "-";
@@ -141,6 +140,7 @@ class _NewExerciseState extends State<NewExercise> {
                     Expanded(
                       child: TextFormField(
                         initialValue: widget.exercise.repetitions.toString(),
+                        enabled: !widget.exercise.byTime,
                         onChanged: (value) {
                           final parsed = int.tryParse(value);
                           if (parsed != null) {
@@ -150,6 +150,7 @@ class _NewExerciseState extends State<NewExercise> {
                         validator: (value) => widget.fieldValidator(value),
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
+                          disabledBorder: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
                           label: Text('Rep'),
                           labelStyle: TextStyle(color: Colors.grey),
